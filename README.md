@@ -18,7 +18,7 @@ __Table of Contents__
 
 __GenReL-World is a general Reinforcement Learning framework to utilize various world models as environments for robot manipulation.__
 
-The goal is to contrust the framework witch utilizes general reinforcement learning algorithms to control a robotic arm. 
+The goal is to contrust the framework which utilizes general reinforcement learning algorithms to control a robotic arm. 
 A big problem in robotics is, that they adapt hardly to new environments or to task, which fall out to the trained task distribution. 
 The adaptation of a general framework can be worthwhile if they can be intagrated to be trained on different world models. 
 
