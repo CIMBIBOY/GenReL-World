@@ -5,12 +5,12 @@
 
 __Table of Contents__
 - [Abstract](#abstract)
-- [Project Work](#project)
+- [Project Work](#project-work)
 - [Setup](#setup)
 - [Installation of Bases](#installation-of-bases)
   * [MetaWorld](#metaworld)
   * [MuJoCo](#mujoco)
-  * [MuJoCo Menagerie](#menagerie)
+  * [MuJoCo Menagerie](#mujoco-menagerie)
 - [References](#references)
 - [Credits](#credits)
 
