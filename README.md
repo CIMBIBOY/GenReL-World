@@ -57,7 +57,7 @@ Here is a list of github repositories of the used sources:
 * [MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie) is a collection of high-quality models for the MuJoCo physics engine including models that work well right out of the gate.
 
 ### MetaWorld
-To install MetaWorld follow the [installation steps]([https://meta-world.github.io/](https://github.com/Farama-Foundation/Metaworld?tab=readme-ov-file#installation).
+To install MetaWorld follow the [installation steps](https://github.com/Farama-Foundation/Metaworld?tab=readme-ov-file#installation).
 The README of MetaWorld is a worthwhile read which can be found [here](https://github.com/Farama-Foundation/Metaworld/blob/master/README.md).
 
 A visualization of MetaWorld can be done in MuJoCo's 3D environment with running [testMetaW.py](https://github.com/CIMBIBOY/GenReL-World/blob/main/testMetaW.py). 
