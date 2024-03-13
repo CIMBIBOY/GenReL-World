@@ -1,8 +1,7 @@
 # GenReL-World
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/CIMBIBOY/GenRel-MetaWorld/blob/master/LICENSE)
 
-# Currently GenReL-World is a work in progress. 
-# In case of constructive toughts please open an issue.
+# Currently GenReL-World is a work in progress. In case of constructive toughts please open an issue.
 
 __Table of Contents__
 - [Abstract](#abstract)
