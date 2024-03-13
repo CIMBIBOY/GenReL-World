@@ -18,7 +18,8 @@ __Table of Contents__
 
 __GenReL-World is a general Reinforcement Learning framework to utilize various world models as environments for robot manipulation.__
 
-The goal is to contrust the framework witch utilizes general reinforcement learning algorithms to control a robotic arm. A big problem in robotics is, that they adapt hardly to new environments or to task, which fall out to the trained task distribution. 
+The goal is to contrust the framework witch utilizes general reinforcement learning algorithms to control a robotic arm. 
+A big problem in robotics is, that they adapt hardly to new environments or to task, which fall out to the trained task distribution. 
 The adaptation of a general framework can be worthwhile if they can be intagrated to be trained on different world models. 
 
 With that only the world model and the encoding to a lower latent representation have to be switched. 
@@ -26,7 +27,9 @@ Implementing the different algorithms and finding connections between them is an
 
 The framework involves reinforcement learning concepts from [(0)](https://www.andrew.cmu.edu/course/10-703/textbook/BartoSutton.pdf) and meta-reinforcement learning and multi-task learning using the MetaWorld open-source simulated benchmark [(1)](https://meta-world.github.io/). 
 
-The project utilizes Google DeepMinds's MuJoCo (Multi-Joint dynamics with Contact) as a general purpose physics engine that aims to facilitate research and development in robotics. [(2)](https://mujoco.org/). The project also includes a built 7 degree of freedom robotic arm which is simulated with MuJoCo Menagerie's xArm7 (or some other model) as a part of the collection of high-quality models for the MuJoCo physics engine, curated by Google DeepMind [(3)](https://github.com/google-deepmind/mujoco_menagerie) [(4)](https://github.com/google-deepmind/mujoco_menagerie/tree/main/ufactory_xarm7). 
+The project utilizes Google DeepMinds's MuJoCo (Multi-Joint dynamics with Contact) as a general purpose physics engine that aims to facilitate research and development in robotics. [(2)](https://mujoco.org/). 
+
+The project also includes a built 7 degree of freedom robotic arm which is simulated with MuJoCo Menagerie's xArm7 (or some other model) as a part of the collection of high-quality models for the MuJoCo physics engine, curated by Google DeepMind [(3)](https://github.com/google-deepmind/mujoco_menagerie) [(4)](https://github.com/google-deepmind/mujoco_menagerie/tree/main/ufactory_xarm7). 
 
 We also share the dream of Yann LeCun about how to construct autonomous intelligent agents [(5)](https://openreview.net/pdf?id=BZ5a1r-kVsf).
 
