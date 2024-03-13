@@ -60,7 +60,7 @@ Here is a list of github repositories of the used sources:
 To install MetaWorld follow the [installation steps]([https://meta-world.github.io/](https://github.com/Farama-Foundation/Metaworld?tab=readme-ov-file#installation).
 The README of MetaWorld is a worthwhile read which can be found [here](https://github.com/Farama-Foundation/Metaworld/blob/master/README.md).
 
-A visualization of MetaWorld can be done in MuJoCo's 3D environment with running [testMetaW.py](). 
+A visualization of MetaWorld can be done in MuJoCo's 3D environment with running [testMetaW.py](https://github.com/CIMBIBOY/GenReL-World/blob/main/testMetaW.py). 
 It is advised to create the testMetaW.py in the instalaltion folder of MetaWorld: /path/to//metaworld here create testMetaW.py. 
 
 The python script can be run with mjpython from a terminal window by finding the path to mujoco instalaltion: /path/to/mujoco/bin/mjpython. 
@@ -74,7 +74,7 @@ For python users this is a simple installation from PyPI as pip install mujaco.
 MuJoCo can also be downloaded from the [offical site](https://mujoco.org/).
 
 ### MuJoCo Menagerie
-To install MuJoCo Menagerie follow the installation steps on the [MuJoCo Menagerie github](https://github.com/google-deepmind/mujoco_menagerie/tree/main?tab=readme-ov-file#installation-and-usage). To visalize xArm7 run the [testxArm7.py](). 
+To install MuJoCo Menagerie follow the installation steps on the [MuJoCo Menagerie github](https://github.com/google-deepmind/mujoco_menagerie/tree/main?tab=readme-ov-file#installation-and-usage). To visalize xArm7 run the [testxArm7.py](https://github.com/CIMBIBOY/GenReL-World/blob/main/testxArm7.py). 
 It is advised to create the testxArm7.py in the instalaltion folder of MetaWorld: /path/to//metaworld here create testxArm7.py.
 
 The path to xArm7's xml file have to be specified in testxArm7.py in line: 
