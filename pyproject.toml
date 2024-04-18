@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "GenRel-World"
+version = "0.1.0"
+description = "GenReL-World is a general Reinforcement Learning framework to utilize various world models as environments for robot manipulation"
+readme = "README.md"
+authors = ["Márk Czimber and Josh Kang <czimbermark@gmail.com>"]
+license = "MIT"
+keywords = ["Reinforcement Learning", "project-work", "RL", "AI", "mujoco", "robotics", "Meta_RL"]
+classifiers = [
+    "Development Status :: 1 - Planning",  # Change to `5 - Production/Stable` when ready
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[tool.poetry.dependencies]
+# Your main dependencies
+python = ">=3.9,<3.13"
+gymnasium = ">=0.29.0"
+numpy = ">=1.18"
+scipy = ">=1.4.1"
+torch = "^2.2.2"
+jax = "^0.4.26"
+flax = "^0.8.2"
+optax = "^0.2.2"
+tensorflow = "^2.16.1"
+mujoco = "^3.1.4"
+metaworld = "^0.0.1.dev0"
+imageio = "^2.34.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
