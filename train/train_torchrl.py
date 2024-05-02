@@ -11,8 +11,12 @@ import sys
 sys.path.append('/Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World')
 from metaworld.envs import ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE
 
-sys.path.append("/Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World/.venv/lib/python3.11/site-packages")
+sys.path.append("/Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World/.venv/lib/python3.11/site-packages/torchrl")
 import torchrl
+try:
+    from torchrl.version import __version__
+except ImportError:
+    __version__ = None
 from torchrl.algorithms import PPO
 from torchrl.policies import MLPPolicy
 from torchrl import utils

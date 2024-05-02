@@ -5,18 +5,31 @@ import numpy as np
 from collections import deque
 import time 
 import matplotlib.pyplot as plt
+import wandb
+
 from torch.utils.tensorboard import SummaryWriter
 
-class SawyerPickPlaceTrainer:
-    def __init__(self, env, hidden_size=128, lr=3e-4, gamma=0.99, lam=0.95, clip_range=0.2, num_epochs=10, batch_size=32, epsilon = 0.1):
+class PPO:
+    def __init__(self, env, num_episodes, wandb='true', hidden_size=128, lr=3e-4, gamma=0.99, lam=0.95, clip_range=0.2, num_epochs=10, batch_size=1, epsilon = 0.1, exploration_decay=1000):
         self.env = env
+
+        if(wandb=='true'):
+            self.wandb_run = wandb.init(project="aitclassproject", entity="czimbermark")
+            self.wandb_config = wandb.config
+            self.wandb_config.num_episodes = num_episodes
+            self.wandb_config.batch_size = batch_size
+
         self.state_size = env.observation_space.shape[0] # state metrics
         self.action_size = env.action_space.shape[0] # action metrics 
+        self.batch_size = batch_size
+
         self.epsilon = epsilon # exploration value
+        self.clip_range = clip_range
+        self.exploration_decay = exploration_decay
 
         # values for broader understanding
         self.episode_successes = deque(maxlen=100) 
-        self.goal_pos = deque(maxlen=1)
+        self.goal_pos = deque(maxlen=3)
         self.target_distances = deque(maxlen=100)
 
         # Actor and critic networks
@@ -40,17 +53,13 @@ class SawyerPickPlaceTrainer:
         self.actor_optimizer = optim.Adam(self.actor_net.parameters(), lr=lr)
         self.critic_optimizer = optim.Adam(self.critic_net.parameters(), lr=lr)
 
+        self.num_episodes = num_episodes
         self.gamma = gamma
         self.lam = lam
-        self.clip_range = clip_range
         self.num_epochs = num_epochs
-        self.batch_size = batch_size
 
         self.episode_rewards = deque(maxlen=100)
         self.episode_lengths = deque(maxlen=100)
-
-        # tensorboard - TODO
-        self.writer = SummaryWriter()
 
     # gae fro esstimating the advantage function
     # how much better or worse an action is compared to the expected value of the state
@@ -65,7 +74,6 @@ class SawyerPickPlaceTrainer:
             last_advantage = advantages[t]
         return advantages
 
-    # update fucntion to compute state action values
     def update(self, states, actions, rewards, dones, next_states):
         states = torch.tensor(np.array(states), dtype=torch.float32)
         actions = torch.tensor(np.array(actions), dtype=torch.float32)
@@ -73,78 +81,85 @@ class SawyerPickPlaceTrainer:
         dones = torch.tensor(np.array(dones), dtype=torch.float32)
         next_states = torch.tensor(np.array(next_states), dtype=torch.float32)
 
-        ''' Debug
-        print(f"States shape: {states.shape}")
-        print(f"Actions shape: {actions.shape}")
-        print(f"Rewards shape: {rewards.shape}")
-        print(f"Dones shape: {dones.shape}")
-        print(f"Next states shape: {next_states.shape}")
-        '''
-
         # Compute values and advantages
         values = self.critic_net(states).squeeze()
         next_values = self.critic_net(next_states).squeeze()
         advantages = self.compute_gae(rewards, values, next_values, dones)
-
-        last_advantage = 0
-        for t in reversed(range(len(rewards))):
-            delta = rewards[t] + self.gamma * next_values[t] * (1 - dones[t]) - values[t]
-            advantages[t] = delta + self.gamma * self.lam * last_advantage
-            last_advantage = advantages[t]
-
         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
         advantages = torch.tensor(advantages, dtype=torch.float32).unsqueeze(1)
 
-        # print(f"Advantages shape: {advantages.shape}")
+        # Compute the current action probabilities
+        current_action_probs = self.actor_net(states)
 
-        # Update the actor net
-        action_probs = self.actor_net(states)
-        log_probs = torch.log(action_probs)
-        actor_loss = -torch.mean(torch.sum(log_probs * actions, dim=1, keepdim=True) * advantages)
+        # Compute the old action probabilities
+        with torch.no_grad():
+            old_action_probs = self.actor_net(states)
+
+        # Compute the ratio of current and old action probabilities
+        ratios = (current_action_probs * actions).sum(dim=1, keepdim=True) / (old_action_probs * actions).sum(dim=1, keepdim=True)
+
+        # Compute the clipped surrogate loss
+        surrogate_loss = -torch.mean(torch.clamp(ratios, 1 - self.clip_range, 1 + self.clip_range) * advantages)
+
+        # Update the actor network
         self.actor_optimizer.zero_grad()
-        actor_loss.backward()
+        surrogate_loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.actor_net.parameters(), 0.5)
         self.actor_optimizer.step()
 
-       
-        # Update the critic net
+        # Update the critic network
         critic_loss = nn.MSELoss()(values, rewards + self.gamma * next_values * (1 - dones))
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
         self.critic_optimizer.step()
 
-    # tensorboard log function - TODO
+        # Debug lines
+        print(f"Surrogate Loss: {surrogate_loss.item()}")
+        print(f"Critic Loss: {critic_loss.item()}")
+        print(f"Average Policy Ratio: {torch.mean(ratios).item()}")
+
+
+    # def wandb_visual 
     def log_metrics(self, episode):
         self.writer.add_scalar("Episode Reward", np.mean(self.episode_rewards), episode)
         self.writer.add_scalar("Episode Length", np.mean(self.episode_lengths), episode)
         self.writer.add_scalar("Episode Success", np.mean(self.episode_successes), episode)
+        wandb.log({
+            "Episode": episode,
+            "Reward": np.mean(self.episode_rewards),
+            "Average Reward": np.mean(self.episode_rewards),
+            "Average Length": np.mean(self.episode_lengths),
+            "Average Success": np.mean(self.episode_successes),
+            "Epsilon": self.epsilon,
+            "Goal Position": self.goal_pos[-1],
+            "Target Distance": self.target_distances[-1]
+        })
 
-    # def wandb_visual - ToDo
 
     # train method with envirnoment stepping
-    def train(self, num_episodes, viewer, start):
-        for episode in range(num_episodes):
+    def train(self, viewer, start):
+        total_steps = 0
+        for episode in range(self.num_episodes):
             state, _ = self.env.reset()
             done = False
             episode_reward = 0
             episode_length = 0
             episode_success = 0
-            states, actions, rewards, dones, next_states = [], [], [], [], []
+            states, actions, rewards, dones, next_states, destinations = [], [], [], [], [], []
 
-            if episode == 0: # explartion decay
-                self.epsilon = max(0.1, 1.0 - episode / 100)
+            # Decay the exploration rate over time using an exponential decay
+            self.epsilon = max(0.1, np.exp(-total_steps / self.exploration_decay))
 
             while not done:
-                # explore first 100
-                # if episode < 50:
-                    # action = self.env.action_space.sample()
-                # Use epsilon-greedy exploration
+                #  Exploration strategy
                 if np.random.rand() < self.epsilon:
                     action = self.env.action_space.sample()
-                    
                 else:
-                    '''Actions optimized by PPO '''
                     action = self.actor_net(torch.tensor(state, dtype=torch.float32)).detach().numpy()
-
+                    action += np.random.normal(0, self.noise_std, size=self.action_size)
+                    action = np.clip(action, self.env.action_space.low, self.env.action_space.high)
+                    print(" ppo action")
+                
                 # actual step function 
                 next_state, reward, done, info, _ = self.env.step(action)
                 viewer.sync()
@@ -156,18 +171,11 @@ class SawyerPickPlaceTrainer:
 
                 # interface debug values for broader understanding timed with built in time
                 current_time = time.time()
-                time.sleep(0.01)
+                time.sleep(0.005)
                 elapsed_time = current_time - start
-                if elapsed_time >= 15:
-                    # Debug
-                    print(f"Current state: {state}")
-                    print(f"Current action: {action}")
-                    print(f"Reward: {reward}")
-                    print(f"Done: {done}")
-                    print(f"Info: {info}")
-                    print(f"State goal pos: {self.env._get_pos_goal}")
-                    print(f"Next state goal Pos : {self.goal_pos}")
-                    # print(f"Target Distance : {self.target_distances}")
+                if elapsed_time >= 9:
+                    print(f"Current action: {action}, \nLast 5 reward: {rewards[-5:]},"
+                           f"\nLast 2 finish position: {destinations[-2:]}, \nGoal position: {self.goal_pos}")
                     start = current_time  # Reset the start time
 
                 # useful parameter saving 
@@ -176,20 +184,23 @@ class SawyerPickPlaceTrainer:
                 rewards.append(reward)
                 dones.append(done)
                 next_states.append(next_state) 
+
                 episode_reward += reward
                 episode_length += 1
                 episode_success += done
                 state = next_state
+                total_steps += 1
 
                 # update call if batch is reached or task is complete
-                if len(states) == self.batch_size or done:
+                if info or done:
                     self.update(states, actions, rewards, dones, next_states)
                     states, actions, rewards, dones, next_states = [], [], [], [], []
                 
                 if done or info:
+                    destinations.append(state[:3])
                     state, _ = self.env.reset()
-
-            # important parameter adding 
+                    
+            # important parameter adding    
             self.episode_rewards.append(episode_reward)
             self.episode_lengths.append(episode_length)
             self.episode_successes.append(episode_success)
@@ -198,4 +209,11 @@ class SawyerPickPlaceTrainer:
             if episode % 10 == 0:
                 print(f"Episode {episode}, Reward: {episode_reward:.2f}, Average Reward: {np.mean(self.episode_rewards):.2f}, "
                     f"Average Length: {np.mean(self.episode_lengths):.2f}, Average Success: {np.mean(self.episode_successes):.2f}")
-                self.log_metrics(episode)   
+                self.log_metrics(episode)
+                wandb.log({
+                    "Episode": episode,
+                    "Reward": episode_reward,
+                    "Average Reward": np.mean(self.episode_rewards),
+                    "Average Length": np.mean(self.episode_lengths),
+                    "Average Success": np.mean(self.episode_successes)
+                })  

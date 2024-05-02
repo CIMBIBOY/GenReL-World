@@ -5,9 +5,9 @@ import numpy as np
 import torch
 import gymnasium as gym
 from gym.wrappers import TimeLimit
-from tensordict.nn import TensorDictModule
-from tensordict.nn.distributions import NormalParamExtractor
-from torch import nn
+from stable_baselines3 import PPO
+from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.env_util import make_vec_env
 
 import sys
 sys.path.append('/Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World')
@@ -15,16 +15,11 @@ import metaworld
 from metaworld.envs import ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE
 import random
 from utils.metaworld_env_wrapper import NormalizedEnvWrapper
-from garage.envs.normalized_env import NormalizedEnv
-
-from garage.tf.algos import PPO
-from garage.tf.policies import GaussianMLPPolicy  # Replace with your chosen policy
-from garage.tf.baselines import ContinuousMLPBaseline
-from garage.sampler import Sampler
 
 # mjpython train/train_garagePPO.py
 
-print(metaworld.ML1.ENV_NAMES)  # Check out the available environments
+print("------------------------ Run start ------------------------")
+# print(metaworld.ML1.ENV_NAMES)  # Check out the available environments
 
 env_cls = ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE["pick-place-v2-goal-observable"]
 env = env_cls(seed=42)
@@ -52,65 +47,37 @@ normalized_env = NormalizedEnvWrapper(
     reward_alpha=0.001
 )
 
-# Now you can use the normalized environment
-gym_env = TimeLimit(normalized_env, max_episode_steps=1000)
+print(type(normalized_env))
+print("Action space:", normalized_env.action_space)
+
+# env = gym.make(normalized_env)
+
+# Create a vectorized environment (required by SB3)
+vec_env = make_vec_env(lambda: normalized_env, n_envs=1)
 
 # Policy initialization
-policy = GaussianMLPPolicy(env_spec=gym_env.spec, hidden_sizes=[64, 64])
-
-# Baseline initialization
-baseline = ContinuousMLPBaseline(env_spec=gym_env.spec)
-
-# Sampler initialization
-sampler = Sampler(gym_env, policy, baseline, max_episode_length=100)
+policy_kwargs = dict(activation_fn=torch.nn.ReLU, net_arch=[64, 64])
 
 # PPO trainer
-trainer = PPO(
-    env_spec=gym_env.spec,
-    policy=policy,
-    baseline=baseline,
-    sampler=sampler,
-    discount=0.99,
-    gae_lambda=1,
-    center_adv=True,
-    positive_adv=False,
-    fixed_horizon=False,
-    lr_clip_range=0.01,
-    max_kl_step=0.01,
-    optimizer="first_order_optimizer",
-    optimizer_args={},
-    policy_ent_coeff=0.0,
-    use_softplus_entropy=False,
-    use_neg_logli_entropy=False,
-    stop_entropy_gradient=False,
-    entropy_method="no_entropy",
-    name="PPO",
-)
+trainer = PPO("MlpPolicy", vec_env, verbose=1, policy_kwargs=policy_kwargs)
 
+# Train the model
+trainer.learn(total_timesteps=10000)
 # Mujoco viewer init
 print("Initializing Mujoco viewer...")
-with mujoco.viewer.launch_passive(gym_env.env.model, gym_env.env.data) as viewer:
+with mujoco.viewer.launch_passive(normalized_env.env.model, normalized_env.env.data) as viewer:
     print("Viewer initialized successfully.")
     # Train on num_steps
     start = time.time()
     time.sleep(0.01)
-    num_steps = 10000
-    for step in range(num_steps):
-        # one step of the environment
-        observation = gym_env.reset()
-        action = trainer.policy.get_action(observation)
-        observation, reward, done, info, _ = gym_env.step(action)
-        
-        # Render the env
-        viewer.sync()
-        
-        # Update the trainer
-        trainer.step(observation, action, reward, done, info)
-        
-        # Check if episode is done
-        if done:
-            observation = gym_env.reset()
-    
+    for _ in range(5):
+        obs = normalized_env.reset()
+        done = False
+        while not done:
+            action, _ = trainer.predict(obs)
+            obs, reward, done, info, _ = normalized_env.step(action)
+            viewer.sync()
+
     # Log elapsed time
     elapsed_time = time.time() - start
     print("Training time:", elapsed_time)
