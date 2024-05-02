@@ -10,7 +10,7 @@ import wandb
 from torch.utils.tensorboard import SummaryWriter
 
 class PPO:
-    def __init__(self, env, num_episodes, wandb='true', hidden_size=128, lr=3e-4, gamma=0.99, lam=0.95, clip_range=0.2, num_epochs=10, batch_size=1, epsilon = 0.1, exploration_decay=1000):
+    def __init__(self, env, num_episodes, wandb='true', hidden_size=128, lr=3e-4, gamma=0.99, lam=0.95, clip_range=0.2, num_epochs=10, batch_size=1, epsilon = 0.1, noise_std=0.1, exploration_decay=1000):
         self.env = env
 
         if(wandb=='true'):
@@ -48,6 +48,7 @@ class PPO:
             nn.ReLU(),
             nn.Linear(hidden_size, 1)
         )
+        self.noise_std = noise_std
 
         # opti
         self.actor_optimizer = optim.Adam(self.actor_net.parameters(), lr=lr)
@@ -151,6 +152,15 @@ class PPO:
             self.epsilon = max(0.1, np.exp(-total_steps / self.exploration_decay))
 
             while not done:
+                if total_steps < 30000:
+                    action = self.env.action_space.sample()
+                elif total_steps == 30000:
+                    print("----------- entered ppo opti ---------------")
+                else:
+                    action = self.actor_net(torch.tensor(state, dtype=torch.float32)).detach().numpy()
+                    action += np.random.normal(0, self.noise_std, size=self.action_size)
+                    action = np.clip(action, self.env.action_space.low, self.env.action_space.high)
+                '''
                 #  Exploration strategy
                 if np.random.rand() < self.epsilon:
                     action = self.env.action_space.sample()
@@ -159,6 +169,7 @@ class PPO:
                     action += np.random.normal(0, self.noise_std, size=self.action_size)
                     action = np.clip(action, self.env.action_space.low, self.env.action_space.high)
                     print(" ppo action")
+                '''
                 
                 # actual step function 
                 next_state, reward, done, info, _ = self.env.step(action)
