@@ -6,6 +6,8 @@ import gym
 import gym.spaces
 import gym.spaces.utils
 import numpy as np
+import akro
+from akro.box import Box
 
 class NormalizedEnvWrapper(gym.Wrapper):
     """An environment wrapper for normalization.
@@ -48,13 +50,20 @@ class NormalizedEnvWrapper(gym.Wrapper):
         self._flatten_obs = flatten_obs
 
         self._obs_alpha = obs_alpha
-        flat_obs_dim = gym.spaces.utils.flatdim(env.observation_space)
+        flat_obs_dim = np.prod(env.observation_space.shape)
+        # flat_obs_dim = gym.spaces.utils.flatdim(env.observation_space)
         self._obs_mean = np.zeros(flat_obs_dim)
         self._obs_var = np.ones(flat_obs_dim)
 
         self._reward_alpha = reward_alpha
         self._reward_mean = 0.0
         self._reward_var = 1.0
+        
+        self._action_space = Box(
+            low=self.env.action_space.low,
+            high=self.env.action_space.high,
+            dtype=self.env.action_space.dtype
+        )
 
     def _update_obs_estimate(self, obs):
         flat_obs = gym.spaces.utils.flatten(self.env.observation_space, obs)
@@ -167,3 +176,26 @@ class NormalizedEnvWrapper(gym.Wrapper):
             reward = self._apply_normalize_reward(reward)
 
         return next_obs, reward * self._scale_reward, done, info
+    
+    
+    def _flatten_obs(self, obs):
+        if isinstance(self.observation_space, gym.spaces.Box):
+            return obs.flatten()
+        else:
+            return gym.spaces.utils.flatten(self.observation_space, obs)
+    
+    
+    @property
+    def action_space(self):
+        return Box(low=self.env.action_space.low, high=self.env.action_space.high, dtype=self.env.action_space.dtype)
+    
+    @property
+    def observation_space(self):
+        obs_space = self.env.observation_space
+        low = np.clip(obs_space.low, -10, 10)
+        high = np.clip(obs_space.high, -10, 10)
+        return Box(low, high, dtype=obs_space.dtype)
+
+    @property
+    def observation_space_flat_dim(self):
+        return gym.spaces.utils.flatdim(self.observation_space)

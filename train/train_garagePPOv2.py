@@ -24,7 +24,7 @@ from garage.sampler import Sampler
 
 # mjpython train/train_garagePPOv2.py
 
-print(metaworld.ML1.ENV_NAMES)  # Check out the available environments
+# print(metaworld.ML1.ENV_NAMES)  # Check out the available environments
 
 env_cls = ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE["pick-place-v2-goal-observable"]
 env = env_cls(seed=42)
@@ -52,8 +52,7 @@ normalized_env = NormalizedEnv(
     reward_alpha=0.001
 )
 
-# Now you can use the normalized environment
-gym_env = TimeLimit(normalized_env, max_episode_steps=1000)
+gym_env = normalized_env
 
 # Policy initialization
 policy = GaussianMLPPolicy(env_spec=gym_env.spec, hidden_sizes=[64, 64])

@@ -21,7 +21,6 @@ classifiers = [
 [tool.poetry.dependencies]
 # Your main dependencies
 python = ">=3.9,<3.13"
-gymnasium = ">=0.29.0"
 numpy = ">=1.18"
 scipy = ">=1.4.1"
 torch = "^2.2.0"
@@ -43,6 +42,10 @@ cma = "^3.3.0"
 tensorflow-probability = "^0.24.0"
 keras = "^3.3.2"
 tf-keras = "^2.16.0"
+wandb = "^0.16.6"
+gym = "^0.17.2"
+gymnasium = "^0.29.1"
+stable-baselines3 = "^2.3.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
