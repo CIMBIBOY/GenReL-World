@@ -7,8 +7,8 @@ sys.path.append('/Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World')
 
 from metaworld.envs import ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE
 import numpy as np
-from models.PPO import PPO
-# from models.PPOv2 import PPO
+# from models.PPO import PPO
+from models.PPOv2 import PPO
 
 print("------------------------ Run start ------------------------")
 # mjpython train/trainMetaW.py
@@ -37,9 +37,9 @@ if __name__ == "__main__":
 
     print(type(env))
 
-    episodes = 1000
+    episodes = 10000
     # Initialize the PPO trainer
-    trainer = PPO(env, num_episodes=episodes, wandb='false', hidden_size=64, lr=3e-4, gamma=0.99, lam=0.95, clip_range=0.2, num_epochs=10, batch_size=32)
+    trainer = PPO(env, num_episodes=episodes, wandb_use=True, hidden_size=64, lr=3e-4, gamma=0.99, lam=0.95, clip_range=0.2, num_epochs=10, batch_size=32)
 
     # Initialize Mujoco viewer
     print("Initializing Mujoco viewer...")

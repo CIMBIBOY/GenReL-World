@@ -13,7 +13,7 @@ class ActorNetwork(nn.Module):
 
     def forward(self, state, hidden):
         output, (h_n, c_n) = self.lstm(state, hidden)
-        action = self.fc(output[:, -1, :])
+        action = self.fc(output[:, -1, :]).unsqueeze(1)
         return action, (h_n, c_n)
 
 class CriticNetwork(nn.Module):
@@ -28,5 +28,5 @@ class CriticNetwork(nn.Module):
 
     def forward(self, state, hidden):
         output, (h_n, c_n) = self.lstm(state, hidden)
-        value = self.fc(output[:, -1, :])
+        value = self.fc(output[:, -1, :]).unsqueeze(1)
         return value, (h_n, c_n)

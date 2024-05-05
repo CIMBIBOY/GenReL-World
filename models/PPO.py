@@ -7,13 +7,13 @@ import time
 import matplotlib.pyplot as plt
 import wandb
 
-from torch.utils.tensorboard import SummaryWriter
 
 class PPO:
-    def __init__(self, env, num_episodes, wandb='true', hidden_size=128, lr=3e-4, gamma=0.99, lam=0.95, clip_range=0.2, num_epochs=10, batch_size=1, epsilon = 0.1, noise_std=0.1, exploration_decay=1000):
+    def __init__(self, env, num_episodes, wandb_use=True, hidden_size=128, lr=3e-4, gamma=0.99, lam=0.95, clip_range=0.2, num_epochs=10, batch_size=1, epsilon = 0.1, noise_std=0.1, exploration_decay=-0.0005):
         self.env = env
 
-        if(wandb=='true'):
+        self.wandb_use = wandb_use
+        if(self.wandb_use==True):
             self.wandb_run = wandb.init(project="aitclassproject", entity="czimbermark")
             self.wandb_config = wandb.config
             self.wandb_config.num_episodes = num_episodes
@@ -53,6 +53,9 @@ class PPO:
         # opti
         self.actor_optimizer = optim.Adam(self.actor_net.parameters(), lr=lr)
         self.critic_optimizer = optim.Adam(self.critic_net.parameters(), lr=lr)
+
+        self.actor_loss = None
+        self.critic_loss = None
 
         self.num_episodes = num_episodes
         self.gamma = gamma
@@ -100,31 +103,23 @@ class PPO:
         ratios = (current_action_probs * actions).sum(dim=1, keepdim=True) / (old_action_probs * actions).sum(dim=1, keepdim=True)
 
         # Compute the clipped surrogate loss
-        surrogate_loss = -torch.mean(torch.clamp(ratios, 1 - self.clip_range, 1 + self.clip_range) * advantages)
+        self.actor_loss = -torch.mean(torch.clamp(ratios, 1 - self.clip_range, 1 + self.clip_range) * advantages)
 
         # Update the actor network
         self.actor_optimizer.zero_grad()
-        surrogate_loss.backward()
+        self.actor_loss.backward()
         torch.nn.utils.clip_grad_norm_(self.actor_net.parameters(), 0.5)
         self.actor_optimizer.step()
 
         # Update the critic network
-        critic_loss = nn.MSELoss()(values, rewards + self.gamma * next_values * (1 - dones))
+        self.critic_loss = nn.MSELoss()(values, rewards + self.gamma * next_values * (1 - dones))
         self.critic_optimizer.zero_grad()
-        critic_loss.backward()
+        self.critic_loss.backward()
         self.critic_optimizer.step()
-
-        # Debug lines
-        print(f"Surrogate Loss: {surrogate_loss.item()}")
-        print(f"Critic Loss: {critic_loss.item()}")
-        print(f"Average Policy Ratio: {torch.mean(ratios).item()}")
 
 
     # def wandb_visual 
     def log_metrics(self, episode):
-        self.writer.add_scalar("Episode Reward", np.mean(self.episode_rewards), episode)
-        self.writer.add_scalar("Episode Length", np.mean(self.episode_lengths), episode)
-        self.writer.add_scalar("Episode Success", np.mean(self.episode_successes), episode)
         wandb.log({
             "Episode": episode,
             "Reward": np.mean(self.episode_rewards),
@@ -147,29 +142,27 @@ class PPO:
             episode_length = 0
             episode_success = 0
             states, actions, rewards, dones, next_states, destinations = [], [], [], [], [], []
-
-            # Decay the exploration rate over time using an exponential decay
-            self.epsilon = max(0.1, np.exp(-total_steps / self.exploration_decay))
+            first_ppo = False
 
             while not done:
-                if total_steps < 30000:
-                    action = self.env.action_space.sample()
-                elif total_steps == 30000:
-                    print("----------- entered ppo opti ---------------")
-                else:
-                    action = self.actor_net(torch.tensor(state, dtype=torch.float32)).detach().numpy()
-                    action += np.random.normal(0, self.noise_std, size=self.action_size)
-                    action = np.clip(action, self.env.action_space.low, self.env.action_space.high)
-                '''
-                #  Exploration strategy
-                if np.random.rand() < self.epsilon:
+                if total_steps < 10000:
                     action = self.env.action_space.sample()
                 else:
-                    action = self.actor_net(torch.tensor(state, dtype=torch.float32)).detach().numpy()
-                    action += np.random.normal(0, self.noise_std, size=self.action_size)
-                    action = np.clip(action, self.env.action_space.low, self.env.action_space.high)
-                    print(" ppo action")
-                '''
+                    # Decay the exploration rate using inverse square root decay
+                    self.epsilon = max(0.1, np.exp(self.exploration_decay * total_steps))
+                    if(first_ppo == False):
+                            print(f"Epsilon init value: {self.epsilon}")
+                    #  Exploration strategy
+                    if np.random.rand() < self.epsilon:
+                        action = self.env.action_space.sample()
+                    else:
+                        if(first_ppo == False):
+                            print("---------- First Policy Optimalization ----------")
+                            first_ppo = True
+                        action = self.actor_net(torch.tensor(state, dtype=torch.float32)).detach().numpy()
+                        action += np.random.normal(0, self.noise_std, size=self.action_size)
+                        action = np.clip(action, self.env.action_space.low, self.env.action_space.high)
+
                 
                 # actual step function 
                 next_state, reward, done, info, _ = self.env.step(action)
@@ -187,6 +180,8 @@ class PPO:
                 if elapsed_time >= 9:
                     print(f"Current action: {action}, \nLast 5 reward: {rewards[-5:]},"
                            f"\nLast 2 finish position: {destinations[-2:]}, \nGoal position: {self.goal_pos}")
+                    print(f"Surrogate Loss: {self.actor_loss.item()}")
+                    print(f"Critic Loss: {self.critic_loss.item()}")
                     start = current_time  # Reset the start time
 
                 # useful parameter saving 
@@ -203,7 +198,7 @@ class PPO:
                 total_steps += 1
 
                 # update call if batch is reached or task is complete
-                if info or done:
+                if len(states) == self.batch_size or done:
                     self.update(states, actions, rewards, dones, next_states)
                     states, actions, rewards, dones, next_states = [], [], [], [], []
                 
@@ -220,11 +215,12 @@ class PPO:
             if episode % 10 == 0:
                 print(f"Episode {episode}, Reward: {episode_reward:.2f}, Average Reward: {np.mean(self.episode_rewards):.2f}, "
                     f"Average Length: {np.mean(self.episode_lengths):.2f}, Average Success: {np.mean(self.episode_successes):.2f}")
-                self.log_metrics(episode)
-                wandb.log({
-                    "Episode": episode,
-                    "Reward": episode_reward,
-                    "Average Reward": np.mean(self.episode_rewards),
-                    "Average Length": np.mean(self.episode_lengths),
-                    "Average Success": np.mean(self.episode_successes)
-                })  
+                if(self.wandb_use == True):
+                    self.log_metrics(episode)
+                    wandb.log({
+                        "Episode": episode,
+                        "Reward": episode_reward,
+                        "Average Reward": np.mean(self.episode_rewards),
+                        "Average Length": np.mean(self.episode_lengths),
+                        "Average Success": np.mean(self.episode_successes)
+                    })  
