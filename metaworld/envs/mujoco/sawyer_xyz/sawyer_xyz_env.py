@@ -45,7 +45,7 @@ class SawyerMocapBase(mjenv_gym):
         """The COM of the gripper's 2 fingers.
 
         Returns:
-            (np.ndarray): 3-element position
+            (np.ndarray): 3-element position    
         """
         right_finger_pos = self.data.site("rightEndEffector")
         left_finger_pos = self.data.site("leftEndEffector")
