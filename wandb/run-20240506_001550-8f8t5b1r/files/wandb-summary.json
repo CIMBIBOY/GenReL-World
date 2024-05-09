@@ -1,0 +1,1 @@
+{"Batch Reward": 0.0027328193807319994, "Avarage Reward": 2230.4404673410227, "Epsilon": 0.44329634482835334, "Advantages": 0.1569208949804306, "_timestamp": 1714952439.944905, "Critic Loss": {"value": 0.00011021016941885529}, "Actor Loss": {"value": -0.1591351715291181}, "_runtime": 5089.269875049591, "_step": 602, "_wandb": {"runtime": 5094}}
