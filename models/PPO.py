@@ -7,6 +7,8 @@ import time
 import matplotlib.pyplot as plt
 import wandb
 
+from torch.utils.tensorboard import SummaryWriter
+
 
 class PPO:
     def __init__(self, env, num_episodes, wandb_use=True, hidden_size=128, lr=3e-4, gamma=0.99, lam=0.95, clip_range=0.2, num_epochs=10, batch_size=1, epsilon = 0.1, noise_std=0.1, exploration_decay=-0.0005):
@@ -49,6 +51,7 @@ class PPO:
             nn.Linear(hidden_size, 1)
         )
         self.noise_std = noise_std
+        self.advantages = None
 
         # opti
         self.actor_optimizer = optim.Adam(self.actor_net.parameters(), lr=lr)
@@ -65,17 +68,21 @@ class PPO:
         self.episode_rewards = deque(maxlen=100)
         self.episode_lengths = deque(maxlen=100)
 
+        self.writer = SummaryWriter()
+
     # gae fro esstimating the advantage function
     # how much better or worse an action is compared to the expected value of the state
     # goal ->  effective policy updates 
     def compute_gae(self, rewards, values, next_values, dones):
         """Compute Generalized Advantage Estimation (GAE)."""
-        advantages = np.zeros_like(rewards)
-        last_advantage = 0
-        for t in reversed(range(len(rewards))):
-            delta = rewards[t] + self.gamma * next_values[t] * (1 - dones[t]) - values[t]
-            advantages[t] = delta + self.gamma * self.lam * last_advantage
-            last_advantage = advantages[t]
+        advantages = torch.zeros_like(values)
+        gae = 0
+
+        for t in reversed(range(values.size(0))):
+            delta = rewards[t] + self.gamma * next_values[t, 0] * torch.logical_not(dones[t]) - values[t, 0]
+            gae = delta + self.gamma * self.lam * gae
+            advantages[t, 0] = gae
+
         return advantages
 
     def update(self, states, actions, rewards, dones, next_states):
@@ -86,11 +93,11 @@ class PPO:
         next_states = torch.tensor(np.array(next_states), dtype=torch.float32)
 
         # Compute values and advantages
-        values = self.critic_net(states).squeeze()
-        next_values = self.critic_net(next_states).squeeze()
-        advantages = self.compute_gae(rewards, values, next_values, dones)
-        advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
-        advantages = torch.tensor(advantages, dtype=torch.float32).unsqueeze(1)
+        values = self.critic_net(states)
+        next_values = self.critic_net(next_states)
+        self.advantages = self.compute_gae(rewards, values, next_values, dones)
+        self.advantages = (self.advantages - self.advantages.mean()) / (self.advantages.std() + 1e-8)
+        self.advantages = self.advantages.clone().detach().requires_grad_(True)
 
         # Compute the current action probabilities
         current_action_probs = self.actor_net(states)
@@ -103,7 +110,7 @@ class PPO:
         ratios = (current_action_probs * actions).sum(dim=1, keepdim=True) / (old_action_probs * actions).sum(dim=1, keepdim=True)
 
         # Compute the clipped surrogate loss
-        self.actor_loss = -torch.mean(torch.clamp(ratios, 1 - self.clip_range, 1 + self.clip_range) * advantages)
+        self.actor_loss = -torch.mean(torch.clamp(ratios, 1 - self.clip_range, 1 + self.clip_range) * self.advantages)
 
         # Update the actor network
         self.actor_optimizer.zero_grad()
@@ -112,29 +119,85 @@ class PPO:
         self.actor_optimizer.step()
 
         # Update the critic network
-        self.critic_loss = nn.MSELoss()(values, rewards + self.gamma * next_values * (1 - dones))
+        self.critic_loss = nn.MSELoss()(values, rewards.unsqueeze(1) + self.gamma * next_values * torch.logical_not(dones).unsqueeze(1))
         self.critic_optimizer.zero_grad()
         self.critic_loss.backward()
         self.critic_optimizer.step()
 
 
-    # def wandb_visual 
+     # def wandb_visual 
     def log_metrics(self, episode):
+        self.writer.add_scalar("Average Reward", np.mean(self.episode_rewards), episode)
+        self.writer.add_scalar("Average Length", np.mean(self.episode_lengths), episode)
+        self.writer.add_scalar("Average Success", np.mean(self.episode_successes), episode)
+        self.writer.add_scalar("Epsilon", self.epsilon, episode)
+        self.writer.add_scalar("Critic Loss", self.critic_loss.item(), episode)
+        self.writer.add_scalar("Actor Loss", self.actor_loss.item(), episode)
         wandb.log({
-            "Episode": episode,
-            "Reward": np.mean(self.episode_rewards),
-            "Average Reward": np.mean(self.episode_rewards),
-            "Average Length": np.mean(self.episode_lengths),
-            "Average Success": np.mean(self.episode_successes),
-            "Epsilon": self.epsilon,
-            "Goal Position": self.goal_pos[-1],
-            "Target Distance": self.target_distances[-1]
-        })
+        "Average Reward": np.mean(self.episode_rewards),
+        "Average Length": np.mean(self.episode_lengths),
+        "Average Success": np.mean(self.episode_successes),
+        "Epsilon": self.epsilon,
+        "Advantages": self.advantages.mean().item(),
+        }, step=episode)
+
+        # Plot the actor and critic losses
+        wandb.log({
+            "Critic Loss": {
+                "value": self.critic_loss.item()
+            },
+            "Actor Loss": {
+                "value": self.actor_loss.item()
+            }
+        }, commit=False)
+
+        # Plot the episode rewards and lengths
+        wandb.log({
+            "Episode Reward": {
+                "value": np.mean(self.episode_rewards)
+            },
+            "Episode Length": {
+                "value": np.mean(self.episode_lengths)
+            }
+        }, commit=False)
+
+        # Commit the logged data to Wandb
+        wandb.log({})
+
+    def log_metrics_info(self, steps, batch_reward, rewards):
+        self.writer.add_scalar("Average Reward", np.mean(self.episode_rewards), steps)
+        self.writer.add_scalar("Average Length", np.mean(self.episode_lengths), steps)
+        self.writer.add_scalar("Average Success", np.mean(self.episode_successes), steps)
+        self.writer.add_scalar("Epsilon", self.epsilon, steps)
+        self.writer.add_scalar("Critic Loss", self.critic_loss.item(), steps)
+        self.writer.add_scalar("Actor Loss", self.actor_loss.item(), steps)
+        # Log advantages
+        self.writer.add_scalar("Advantages", self.advantages.mean().item(), steps)
+        wandb.log({
+        "Batch Reward": np.mean(batch_reward),
+        "Avarage Reward": np.mean(rewards),
+        "Epsilon": self.epsilon,
+        "Advantages": self.advantages.mean().item(),
+        }, step=steps)
+
+        # Plot the actor and critic losses
+        wandb.log({
+            "Critic Loss": {
+                "value": self.critic_loss.item()
+            },
+            "Actor Loss": {
+                "value": self.actor_loss.item()
+            }
+        }, commit=False)
+
+        # Commit the logged data to Wandb
+        wandb.log({})
 
 
     # train method with envirnoment stepping
-    def train(self, viewer, start):
+    def train(self, viewer):
         total_steps = 0
+        log_steps = 0
         for episode in range(self.num_episodes):
             state, _ = self.env.reset()
             done = False
@@ -167,22 +230,7 @@ class PPO:
                 # actual step function 
                 next_state, reward, done, info, _ = self.env.step(action)
                 viewer.sync()
-
-                # values for broader understanding
-                self.goal_pos.append(np.linalg.norm(next_state[-3:]))
-                self.target_distances.append(np.linalg.norm(next_state[4:7] - self.env._target_pos))
-                self.episode_successes.append(done)
-
-                # interface debug values for broader understanding timed with built in time
-                current_time = time.time()
-                time.sleep(0.005)
-                elapsed_time = current_time - start
-                if elapsed_time >= 9:
-                    print(f"Current action: {action}, \nLast 5 reward: {rewards[-5:]},"
-                           f"\nLast 2 finish position: {destinations[-2:]}, \nGoal position: {self.goal_pos}")
-                    print(f"Surrogate Loss: {self.actor_loss.item()}")
-                    print(f"Critic Loss: {self.critic_loss.item()}")
-                    start = current_time  # Reset the start time
+                time.sleep(0.008)
 
                 # useful parameter saving 
                 states.append(state)
@@ -191,6 +239,9 @@ class PPO:
                 dones.append(done)
                 next_states.append(next_state) 
 
+                # values for broader understanding
+                self.goal_pos.append(np.linalg.norm(next_state[-3:]))
+                self.target_distances.append(np.linalg.norm(next_state[4:7] - self.env._target_pos))
                 episode_reward += reward
                 episode_length += 1
                 episode_success += done
@@ -203,6 +254,9 @@ class PPO:
                     states, actions, rewards, dones, next_states = [], [], [], [], []
                 
                 if done or info:
+                    log_steps += 1
+                    if self.wandb_use == True:
+                        self.log_metrics_info(log_steps, rewards, episode_reward)
                     destinations.append(state[:3])
                     state, _ = self.env.reset()
                     
@@ -217,10 +271,3 @@ class PPO:
                     f"Average Length: {np.mean(self.episode_lengths):.2f}, Average Success: {np.mean(self.episode_successes):.2f}")
                 if(self.wandb_use == True):
                     self.log_metrics(episode)
-                    wandb.log({
-                        "Episode": episode,
-                        "Reward": episode_reward,
-                        "Average Reward": np.mean(self.episode_rewards),
-                        "Average Length": np.mean(self.episode_lengths),
-                        "Average Success": np.mean(self.episode_successes)
-                    })  
