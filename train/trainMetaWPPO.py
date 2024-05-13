@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     episodes = 1000
     # Initialize the PPO trainer
-    trainer = PPO(env, num_episodes=episodes, wandb_use=True, hidden_size=256, lr=3e-6, gamma=0.99, lam=0.95, clip_range=0.2, batch_size=64)
+    trainer = PPO(env, num_episodes=episodes, wandb_use=True, hidden_size=512, lr=3e-6, gamma=0.99, lam=0.95, clip_range=0.2, batch_size=16)
 
     # Initialize Mujoco viewer
     print("Initializing Mujoco viewer...")

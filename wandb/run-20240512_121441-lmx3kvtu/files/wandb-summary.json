@@ -1,0 +1,1 @@
+{"Epsilon": 0.15, "Advantages": 2.1078263578999668e-09, "_timestamp": 1715509604.697238, "Critic Loss": {"value": 29.90375518798828}, "Actor Loss": {"value": 0.003177399281412363}, "Episode Reward": {"value": -271.98093742119875}, "Episode Length": {"value": 26395.01}, "_runtime": 723.3889598846436, "_step": 254, "_wandb": {"runtime": 722}}

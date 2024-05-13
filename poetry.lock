@@ -91,6 +91,20 @@ tests-mypy = ["mypy (>=1.6)", "pytest-mypy-plugins"]
 tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "pytest (>=4.3.0)", "pytest-xdist[psutil]"]
 
 [[package]]
+name = "box2d-py"
+version = "2.3.5"
+description = "Python Box2D"
+optional = false
+python-versions = "*"
+files = [
+    {file = "box2d-py-2.3.5.tar.gz", hash = "sha256:b37dc38844bcd7def48a97111d2b082e4f81cca3cece7460feb3eacda0da2207"},
+    {file = "box2d_py-2.3.5-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:287aa54005c0644b47bf7ad72966e4068d66e56bcf8458f5b4a653ffe42a2618"},
+    {file = "box2d_py-2.3.5-cp36-cp36m-macosx_10_13_x86_64.whl", hash = "sha256:483b3f9acd5d156b72bf2013f93cf7f8ca0ee1562e43d2353ab4c0cbec4ee49a"},
+    {file = "box2d_py-2.3.5-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:a294c2d7cc73cc05dd491287079e15419eb98caa3158df94f40faf85eeb4b6e9"},
+    {file = "box2d_py-2.3.5-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:0d46068eb8d29e366ed698ab2a4833d4d2d34ed035ebd6a685888007dda05f64"},
+]
+
+[[package]]
 name = "cached-property"
 version = "1.5.2"
 description = "A decorator for caching properties in classes."
@@ -758,17 +772,6 @@ ssh = ["paramiko"]
 tqdm = ["tqdm"]
 
 [[package]]
-name = "future"
-version = "1.0.0"
-description = "Clean single-source support for Python 3 and 2"
-optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-files = [
-    {file = "future-1.0.0-py3-none-any.whl", hash = "sha256:929292d34f5872e70396626ef385ec22355a1fae8ad29e1a734c3e43f9fbc216"},
-    {file = "future-1.0.0.tar.gz", hash = "sha256:bd2968309307861edae1458a4f8a4f3598c03be43b97521076aebf5d94c07b05"},
-]
-
-[[package]]
 name = "gast"
 version = "0.5.4"
 description = "Python AST that abstracts the underlying Python version"
@@ -907,26 +910,42 @@ protobuf = ["grpcio-tools (>=1.63.0)"]
 
 [[package]]
 name = "gym"
-version = "0.17.3"
-description = "The OpenAI Gym: A toolkit for developing and comparing your reinforcement learning agents."
+version = "0.26.2"
+description = "Gym: A universal API for reinforcement learning environments"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.6"
 files = [
-    {file = "gym-0.17.3.tar.gz", hash = "sha256:96a7dd4e9cdb39e30c7a79e5773570fd9408f7fdb58c714c293cfbb314818eb6"},
+    {file = "gym-0.26.2.tar.gz", hash = "sha256:e0d882f4b54f0c65f203104c24ab8a38b039f1289986803c7d02cdbe214fbcc4"},
 ]
 
 [package.dependencies]
-cloudpickle = ">=1.2.0,<1.7.0"
-numpy = ">=1.10.4"
-pyglet = ">=1.4.0,<=1.5.0"
-scipy = "*"
+cloudpickle = ">=1.2.0"
+gym_notices = ">=0.0.4"
+importlib_metadata = {version = ">=4.8.0", markers = "python_version < \"3.10\""}
+numpy = ">=1.18.0"
 
 [package.extras]
-all = ["Pillow", "atari_py (>=0.2.0,<0.3.0)", "box2d-py (>=2.3.5,<2.4.0)", "imageio", "imageio", "mujoco_py (>=1.50,<2.0)", "mujoco_py (>=1.50,<2.0)", "opencv-python"]
-atari = ["Pillow", "atari_py (>=0.2.0,<0.3.0)", "opencv-python"]
-box2d = ["box2d-py (>=2.3.5,<2.4.0)"]
-mujoco = ["imageio", "mujoco_py (>=1.50,<2.0)"]
-robotics = ["imageio", "mujoco_py (>=1.50,<2.0)"]
+accept-rom-license = ["autorom[accept-rom-license] (>=0.4.2,<0.5.0)"]
+all = ["ale-py (>=0.8.0,<0.9.0)", "box2d-py (==2.3.5)", "imageio (>=2.14.1)", "lz4 (>=3.1.0)", "matplotlib (>=3.0)", "moviepy (>=1.0.0)", "mujoco (==2.2)", "mujoco_py (>=2.1,<2.2)", "opencv-python (>=3.0)", "pygame (==2.1.0)", "pytest (==7.0.1)", "swig (==4.*)"]
+atari = ["ale-py (>=0.8.0,<0.9.0)"]
+box2d = ["box2d-py (==2.3.5)", "pygame (==2.1.0)", "swig (==4.*)"]
+classic-control = ["pygame (==2.1.0)"]
+mujoco = ["imageio (>=2.14.1)", "mujoco (==2.2)"]
+mujoco-py = ["mujoco_py (>=2.1,<2.2)"]
+other = ["lz4 (>=3.1.0)", "matplotlib (>=3.0)", "moviepy (>=1.0.0)", "opencv-python (>=3.0)"]
+testing = ["box2d-py (==2.3.5)", "imageio (>=2.14.1)", "lz4 (>=3.1.0)", "matplotlib (>=3.0)", "moviepy (>=1.0.0)", "mujoco (==2.2)", "mujoco_py (>=2.1,<2.2)", "opencv-python (>=3.0)", "pygame (==2.1.0)", "pytest (==7.0.1)", "swig (==4.*)"]
+toy-text = ["pygame (==2.1.0)"]
+
+[[package]]
+name = "gym-notices"
+version = "0.0.8"
+description = "Notices for gym"
+optional = false
+python-versions = "*"
+files = [
+    {file = "gym-notices-0.0.8.tar.gz", hash = "sha256:ad25e200487cafa369728625fe064e88ada1346618526102659b4640f2b4b911"},
+    {file = "gym_notices-0.0.8-py3-none-any.whl", hash = "sha256:e5f82e00823a166747b4c2a07de63b6560b1acb880638547e0cabf825a01e463"},
+]
 
 [[package]]
 name = "gymnasium"
@@ -940,10 +959,13 @@ files = [
 ]
 
 [package.dependencies]
+box2d-py = {version = "2.3.5", optional = true, markers = "extra == \"box2d\""}
 cloudpickle = ">=1.2.0"
 farama-notifications = ">=0.0.1"
 importlib-metadata = {version = ">=4.8.0", markers = "python_version < \"3.10\""}
 numpy = ">=1.21.0"
+pygame = {version = ">=2.1.3", optional = true, markers = "extra == \"box2d\""}
+swig = {version = "==4.*", optional = true, markers = "extra == \"box2d\""}
 typing-extensions = ">=4.3.0"
 
 [package.extras]
@@ -1088,13 +1110,13 @@ files = [
 
 [[package]]
 name = "jax"
-version = "0.4.27"
+version = "0.4.28"
 description = "Differentiate, compile, and transform Numpy code."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "jax-0.4.27-py3-none-any.whl", hash = "sha256:02cafc7310d0b89bead77a1559b719fbfa84c0e6683715b4941e04487a6d377e"},
-    {file = "jax-0.4.27.tar.gz", hash = "sha256:f3d7f19bdc0a17ccdb305086099a5a90c704f904d4272a70debe06ae6552998c"},
+    {file = "jax-0.4.28-py3-none-any.whl", hash = "sha256:6a181e6b5a5b1140e19cdd2d5c4aa779e4cb4ec627757b918be322d8e81035ba"},
+    {file = "jax-0.4.28.tar.gz", hash = "sha256:dcf0a44aff2e1713f0a2b369281cd5b79d8c18fc1018905c4125897cb06b37e9"},
 ]
 
 [package.dependencies]
@@ -1113,43 +1135,43 @@ scipy = [
 
 [package.extras]
 australis = ["protobuf (>=3.13,<4)"]
-ci = ["jaxlib (==0.4.26)"]
-cpu = ["jaxlib (==0.4.27)"]
-cuda = ["jaxlib (==0.4.27+cuda12.cudnn89)"]
-cuda12 = ["jax-cuda12-plugin (==0.4.27)", "jaxlib (==0.4.27)", "nvidia-cublas-cu12 (>=12.1.3.1)", "nvidia-cuda-cupti-cu12 (>=12.1.105)", "nvidia-cuda-nvcc-cu12 (>=12.1.105)", "nvidia-cuda-runtime-cu12 (>=12.1.105)", "nvidia-cudnn-cu12 (>=8.9.2.26,<9.0)", "nvidia-cufft-cu12 (>=11.0.2.54)", "nvidia-cusolver-cu12 (>=11.4.5.107)", "nvidia-cusparse-cu12 (>=12.1.0.106)", "nvidia-nccl-cu12 (>=2.18.1)", "nvidia-nvjitlink-cu12 (>=12.1.105)"]
-cuda12-cudnn89 = ["jaxlib (==0.4.27+cuda12.cudnn89)"]
-cuda12-local = ["jaxlib (==0.4.27+cuda12.cudnn89)"]
-cuda12-pip = ["jaxlib (==0.4.27+cuda12.cudnn89)", "nvidia-cublas-cu12 (>=12.1.3.1)", "nvidia-cuda-cupti-cu12 (>=12.1.105)", "nvidia-cuda-nvcc-cu12 (>=12.1.105)", "nvidia-cuda-runtime-cu12 (>=12.1.105)", "nvidia-cudnn-cu12 (>=8.9.2.26,<9.0)", "nvidia-cufft-cu12 (>=11.0.2.54)", "nvidia-cusolver-cu12 (>=11.4.5.107)", "nvidia-cusparse-cu12 (>=12.1.0.106)", "nvidia-nccl-cu12 (>=2.18.1)", "nvidia-nvjitlink-cu12 (>=12.1.105)"]
-minimum-jaxlib = ["jaxlib (==0.4.23)"]
-tpu = ["jaxlib (==0.4.27)", "libtpu-nightly (==0.1.dev20240507)", "requests"]
+ci = ["jaxlib (==0.4.27)"]
+cpu = ["jaxlib (==0.4.28)"]
+cuda = ["jaxlib (==0.4.28+cuda12.cudnn89)"]
+cuda12 = ["jax-cuda12-plugin (==0.4.28)", "jaxlib (==0.4.28)", "nvidia-cublas-cu12 (>=12.1.3.1)", "nvidia-cuda-cupti-cu12 (>=12.1.105)", "nvidia-cuda-nvcc-cu12 (>=12.1.105)", "nvidia-cuda-runtime-cu12 (>=12.1.105)", "nvidia-cudnn-cu12 (>=8.9.2.26,<9.0)", "nvidia-cufft-cu12 (>=11.0.2.54)", "nvidia-cusolver-cu12 (>=11.4.5.107)", "nvidia-cusparse-cu12 (>=12.1.0.106)", "nvidia-nccl-cu12 (>=2.18.1)", "nvidia-nvjitlink-cu12 (>=12.1.105)"]
+cuda12-cudnn89 = ["jaxlib (==0.4.28+cuda12.cudnn89)"]
+cuda12-local = ["jaxlib (==0.4.28+cuda12.cudnn89)"]
+cuda12-pip = ["jaxlib (==0.4.28+cuda12.cudnn89)", "nvidia-cublas-cu12 (>=12.1.3.1)", "nvidia-cuda-cupti-cu12 (>=12.1.105)", "nvidia-cuda-nvcc-cu12 (>=12.1.105)", "nvidia-cuda-runtime-cu12 (>=12.1.105)", "nvidia-cudnn-cu12 (>=8.9.2.26,<9.0)", "nvidia-cufft-cu12 (>=11.0.2.54)", "nvidia-cusolver-cu12 (>=11.4.5.107)", "nvidia-cusparse-cu12 (>=12.1.0.106)", "nvidia-nccl-cu12 (>=2.18.1)", "nvidia-nvjitlink-cu12 (>=12.1.105)"]
+minimum-jaxlib = ["jaxlib (==0.4.27)"]
+tpu = ["jaxlib (==0.4.28)", "libtpu-nightly (==0.1.dev20240508)", "requests"]
 
 [[package]]
 name = "jaxlib"
-version = "0.4.27"
+version = "0.4.28"
 description = "XLA library for JAX"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "jaxlib-0.4.27-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:9493a92c8a8796bbb96b422430465437a1d4426e0b444a86bb2e7c2ea9dfbe69"},
-    {file = "jaxlib-0.4.27-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:93f0714b2c37dbc3c31e30c7b40296b9947d0bd61070410b271527084cf7f66d"},
-    {file = "jaxlib-0.4.27-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:8267b015b3b1f8d1fc6779f93c035e4ccc3092692d0b17b05c5169e73785862f"},
-    {file = "jaxlib-0.4.27-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:d04febab81452f0bc611ec88f23c9a480fd968b845a9f942283bd6fbd229ac23"},
-    {file = "jaxlib-0.4.27-cp310-cp310-win_amd64.whl", hash = "sha256:1828c0f0546cf9c252ef6afbd0b93fc0836a3c5ee27336c0b4a33cf7c602625e"},
-    {file = "jaxlib-0.4.27-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:8feb311b63a6e1b23acc2b69070bf4feae07d8c4e673679d9d1e7d5928692bc5"},
-    {file = "jaxlib-0.4.27-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:867705bcc7f2e7769b719b03257542647922423165cba79c63a27b4d5e957eaa"},
-    {file = "jaxlib-0.4.27-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:f030b9f8914e2de193cc1bd7afd9eca2e03aa48347372fbb89dbb481c2614505"},
-    {file = "jaxlib-0.4.27-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:2b75c09d838fccfb7d4463025b597bc377a1a349d09ffa8fb8c5a7f88197f7e8"},
-    {file = "jaxlib-0.4.27-cp311-cp311-win_amd64.whl", hash = "sha256:d37f1d8cab6fca11d8ba44d6404fdbb9b796d4e6f447d12317e4ce0660310072"},
-    {file = "jaxlib-0.4.27-cp312-cp312-macosx_10_14_x86_64.whl", hash = "sha256:1bbfabae8c4e8c1daed701d3f2b2390399bdc805c152b9f3446f2912c85f7b65"},
-    {file = "jaxlib-0.4.27-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:6ea7b3c56d2341a4b6f1a69bd8e11dbdef3c566bca6538d77f24e23a7fc54601"},
-    {file = "jaxlib-0.4.27-cp312-cp312-manylinux2014_aarch64.whl", hash = "sha256:c8cfc399f01f717fe80eb47f76ed13c037340fb274703b0e61a9bd8ab00b5488"},
-    {file = "jaxlib-0.4.27-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:85f8a0ae137dbd01ce563deae8220dde82d7a98ad4bf3a3cf159deee39dc81c9"},
-    {file = "jaxlib-0.4.27-cp312-cp312-win_amd64.whl", hash = "sha256:9379594f35a9cab8dded3b78a930fe022fd838159388909f75c02ab307dff057"},
-    {file = "jaxlib-0.4.27-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:d909bfbdfe358aa48fd3c8a9059df797655cca84e560b45de1cf2894c702ef7e"},
-    {file = "jaxlib-0.4.27-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:b545c4379d5ec84025985875620f5b1a6519a6bb932fc4368c76fc859af131f4"},
-    {file = "jaxlib-0.4.27-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:b3d2761a4f0a964521bdd8966abdb072fdead75fe6d542e31e57e96d420d8a06"},
-    {file = "jaxlib-0.4.27-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:76640b14f618a4615a44339d1f6287a50e4e03a6612a56de4ff8e24488e7429a"},
-    {file = "jaxlib-0.4.27-cp39-cp39-win_amd64.whl", hash = "sha256:9d10fa2bf384ef27ad0689a746f441bab7df770906ae2f69f3126d84b09ecda5"},
+    {file = "jaxlib-0.4.28-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:a421d237f8c25d2850166d334603c673ddb9b6c26f52bc496704b8782297bd66"},
+    {file = "jaxlib-0.4.28-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:f038e68bd10d1a3554722b0bbe36e6a448384437a75aa9d283f696f0ed9f8c09"},
+    {file = "jaxlib-0.4.28-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:fabe77c174e9e196e9373097cefbb67e00c7e5f9d864583a7cfcf9dabd2429b6"},
+    {file = "jaxlib-0.4.28-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:e3bcdc6f8e60f8554f415c14d930134e602e3ca33c38e546274fd545f875769b"},
+    {file = "jaxlib-0.4.28-cp310-cp310-win_amd64.whl", hash = "sha256:a8b31c0e5eea36b7915696b9be40ea8646edc395a3e5437bf7ef26b7239a567a"},
+    {file = "jaxlib-0.4.28-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:2ff8290edc7b92c7eae52517f65492633e267b2e9067bad3e4c323d213e77cf5"},
+    {file = "jaxlib-0.4.28-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:793857faf37f371cafe752fea5fc811f435e43b8fb4b502058444a7f5eccf829"},
+    {file = "jaxlib-0.4.28-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:b41a6b0d506c09f86a18ecc05bd376f072b548af89c333107e49bb0c09c1a3f8"},
+    {file = "jaxlib-0.4.28-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:45ce0f3c840cff8236cff26c37f26c9ff078695f93e0c162c320c281f5041275"},
+    {file = "jaxlib-0.4.28-cp311-cp311-win_amd64.whl", hash = "sha256:d4d762c3971d74e610a0e85a7ee063cea81a004b365b2a7dc65133f08b04fac5"},
+    {file = "jaxlib-0.4.28-cp312-cp312-macosx_10_14_x86_64.whl", hash = "sha256:d6c09a545329722461af056e735146d2c8c74c22ac7426a845eb69f326b4f7a0"},
+    {file = "jaxlib-0.4.28-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:8dd8bffe3853702f63cd924da0ee25734a4d19cd5c926be033d772ba7d1c175d"},
+    {file = "jaxlib-0.4.28-cp312-cp312-manylinux2014_aarch64.whl", hash = "sha256:de2e8521eb51e16e85093a42cb51a781773fa1040dcf9245d7ea160a14ee5a5b"},
+    {file = "jaxlib-0.4.28-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:46a1aa857f4feee8a43fcba95c0e0ab62d40c26cc9730b6c69655908ba359f8d"},
+    {file = "jaxlib-0.4.28-cp312-cp312-win_amd64.whl", hash = "sha256:eee428eac31697a070d655f1f24f6ab39ced76750d93b1de862377a52dcc2401"},
+    {file = "jaxlib-0.4.28-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:4f98cc837b2b6c6dcfe0ab7ff9eb109314920946119aa3af9faa139718ff2787"},
+    {file = "jaxlib-0.4.28-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:b01562ec8ad75719b7d0389752489e97eb6b4dcb4c8c113be491634d5282ad3c"},
+    {file = "jaxlib-0.4.28-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:aa77a9360a395ba9faf6932df637686fb0c14ddcf4fdc1d2febe04bc88a580a6"},
+    {file = "jaxlib-0.4.28-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:4a56ebf05b4a4c1791699d874e072f3f808f0986b4010b14fb549a69c90ca9dc"},
+    {file = "jaxlib-0.4.28-cp39-cp39-win_amd64.whl", hash = "sha256:459a4ddcc3e120904b9f13a245430d7801d707bca48925981cbdc59628057dc8"},
 ]
 
 [package.dependencies]
@@ -1641,8 +1663,8 @@ files = [
 [package.dependencies]
 numpy = [
     {version = ">1.20", markers = "python_version < \"3.10\""},
-    {version = ">=1.21.2", markers = "python_version >= \"3.10\" and python_version < \"3.11\""},
     {version = ">=1.23.3", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
+    {version = ">=1.21.2", markers = "python_version >= \"3.10\" and python_version < \"3.11\""},
     {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
 ]
 
@@ -2104,13 +2126,13 @@ torch = ["torch"]
 
 [[package]]
 name = "orbax-checkpoint"
-version = "0.5.10"
+version = "0.5.11"
 description = "Orbax Checkpoint"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "orbax_checkpoint-0.5.10-py3-none-any.whl", hash = "sha256:377dd952410038731486e5fbbb91704e0feb027c2d4faf1f56f5276bcb01ee51"},
-    {file = "orbax_checkpoint-0.5.10.tar.gz", hash = "sha256:2e00657383c6fcdc3209203c32d95decad798d975ec5973592e5e32d40455d80"},
+    {file = "orbax_checkpoint-0.5.11-py3-none-any.whl", hash = "sha256:a0950119f6fece0d2e2d84e04c6ca2136b6c2a59ef996927765f8511d8ee4139"},
+    {file = "orbax_checkpoint-0.5.11.tar.gz", hash = "sha256:64161132c83888c2ccee4db80078914507e5f35ad47bcf5bfc5fa2b07036a2a7"},
 ]
 
 [package.dependencies]
@@ -2415,17 +2437,14 @@ files = [
 
 [[package]]
 name = "pyglet"
-version = "1.5.0"
-description = "Cross-platform windowing and multimedia library"
+version = "2.0.15"
+description = "pyglet is a cross-platform games and multimedia package."
 optional = false
-python-versions = "*"
+python-versions = ">=3.8"
 files = [
-    {file = "pyglet-1.5.0-py2.py3-none-any.whl", hash = "sha256:a42f599ebd0dc8113563041c402ae09be05cdcbc643bb1183785141ba3c3304e"},
-    {file = "pyglet-1.5.0.zip", hash = "sha256:6ea918985feddfa9bf0fcc01ffe9ff5849e7b6e832d9b2e03b9d2a36369cb6ee"},
+    {file = "pyglet-2.0.15-py3-none-any.whl", hash = "sha256:9e4cc16efc308106fd3a9ff8f04e7a6f4f6a807c6ac8a331375efbbac8be85af"},
+    {file = "pyglet-2.0.15.tar.gz", hash = "sha256:42085567cece0c7f1c14e36eef799938cbf528cfbb0150c484b984f3ff1aa771"},
 ]
-
-[package.dependencies]
-future = "*"
 
 [[package]]
 name = "pygments"
@@ -3013,6 +3032,31 @@ extra-no-roms = ["opencv-python", "pillow", "psutil", "pygame", "rich", "shimmy[
 tests = ["black (>=24.2.0,<25)", "mypy", "pytest", "pytest-cov", "pytest-env", "pytest-xdist", "ruff (>=0.3.1)"]
 
 [[package]]
+name = "swig"
+version = "4.2.1"
+description = "SWIG is a software development tool that connects programs written in C and C++ with a variety of high-level programming languages."
+optional = false
+python-versions = "*"
+files = [
+    {file = "swig-4.2.1-py2.py3-none-macosx_10_9_universal2.whl", hash = "sha256:3b7389a1c86d39637b7364f11a1dd8cfb52b1ebba40a2356d2ded74498f4cff7"},
+    {file = "swig-4.2.1-py2.py3-none-macosx_10_9_x86_64.whl", hash = "sha256:5c8826b415d6feaca2bbf1f4bd0ff900d6dbb9ddd3b1850f95129b8aac1eb44b"},
+    {file = "swig-4.2.1-py2.py3-none-macosx_11_0_arm64.whl", hash = "sha256:6f30b409d20b1e96f5432bf94e0106cf68596884b6da70323d5a21b8f43e3f3b"},
+    {file = "swig-4.2.1-py2.py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5c4d8e3c928d5efba698b4610a9292b51a0597958ced79506f76f102ac621184"},
+    {file = "swig-4.2.1-py2.py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:4f8931d0f33a91a611f084a26ecf1364845b5ff8b417db2b99cc8b8a4d8215e3"},
+    {file = "swig-4.2.1-py2.py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:9f3482aadf1d6ce3122a84fcd854c32dd5031dd65dba5d5dd9f73deb7333c505"},
+    {file = "swig-4.2.1-py2.py3-none-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:7ce1fd4518ca0a63b809177ed8e0ec11ab485f8ebb66752605c978b964e75b5b"},
+    {file = "swig-4.2.1-py2.py3-none-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:c7b2db2ccff556dbfc88ef98773b3524b18bc4077ea1d7a5d7339c3a1f3f70dc"},
+    {file = "swig-4.2.1-py2.py3-none-musllinux_1_1_aarch64.whl", hash = "sha256:0cd1812ef95a806eec82ee74b601aa0afd616beffb4227afe090bdc12f690286"},
+    {file = "swig-4.2.1-py2.py3-none-musllinux_1_1_i686.whl", hash = "sha256:bfe68d1c8294632bc6e9a1be7abfb3daafce0794d8dfa94fbccd6326073124b8"},
+    {file = "swig-4.2.1-py2.py3-none-musllinux_1_1_ppc64le.whl", hash = "sha256:23d2f90145b32e74f7386b5a99168ecd3000fad232530866c2b390325a39da19"},
+    {file = "swig-4.2.1-py2.py3-none-musllinux_1_1_s390x.whl", hash = "sha256:3b19337ab24aa5483bea5a36282e454c18ed03af1ada0efd92d02c1bea96dbd1"},
+    {file = "swig-4.2.1-py2.py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:30bfb7d8f4bc6ae843c9f36825abfe1fbdadf0982cbb119af64da3f750c01620"},
+    {file = "swig-4.2.1-py2.py3-none-win32.whl", hash = "sha256:41cbe797f6ba49fc600c629928e1afd2632be23bc7d1603543360234e1773dae"},
+    {file = "swig-4.2.1-py2.py3-none-win_amd64.whl", hash = "sha256:2482156f6fba8a8a720246a95d203530834e3d8da981f904ef71c1a7e9d68efe"},
+    {file = "swig-4.2.1.tar.gz", hash = "sha256:cdbb1748132ce99defaf4ebf1736c457fb13788183264af28f17d0d477e109ba"},
+]
+
+[[package]]
 name = "sympy"
 version = "1.12"
 description = "Computer algebra system (CAS) in Python"
@@ -3374,7 +3418,7 @@ optree = ["optree (>=0.9.1)"]
 
 [[package]]
 name = "torchrl"
-version = "0.4.0+7348af3"
+version = "0.4.0+be0747d"
 description = ""
 optional = false
 python-versions = "*"
@@ -3404,7 +3448,7 @@ utils = ["git", "hydra-core (>=1.1)", "hydra-submitit-launcher", "tensorboard", 
 type = "git"
 url = "https://github.com/pytorch/rl.git"
 reference = "HEAD"
-resolved_reference = "be0747d4ddd5558f940dc1d501799cf734e80cbc"
+resolved_reference = "e77f0dd8a8c129ddd213c29a23637655081fc7d7"
 
 [[package]]
 name = "triton"
@@ -3638,4 +3682,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "5c16070ac6293852bc7cd8c6ea7da427ca32732c9bd515606bc7dde7596b7d12"
+content-hash = "dc76725b17356e56f29982273b3ea3c3e4ae28c481fd2aee4637b8f6972ce776"

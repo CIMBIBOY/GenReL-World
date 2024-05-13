@@ -11,67 +11,68 @@ import sys
 sys.path.append('/Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World')
 from metaworld.envs import ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE
 
-sys.path.append("/Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World/.venv/lib/python3.11/site-packages/torchrl")
+sys.path.append("/Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World/.venv/lib/python3.11/site-packages/")
 import torchrl
-try:
-    from torchrl.version import __version__
-except ImportError:
-    __version__ = None
-from torchrl.algorithms import PPO
-from torchrl.policies import MLPPolicy
-from torchrl import utils
+import gym
+import torch
+import torch.nn as nn
+from torchrl.networks.base import MLPNetwork
+from torchrl.objectives.ppo import PPOLoss
 
-# mjpython train/train_torchrl.py
+# Set up the environment
+env = gym.make('MoonLanderContinuous-v2', render = "human")
 
-# Choose the specific environment you want to use
-env_cls = ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE["pick-place-v2-goal-observable"]
-env = env_cls(seed=0)
-env2 = env_cls(seed=0)
+# Define the policy and value networks
+policy_net = MLPNetwork(
+    input_size=env.observation_space.shape[0],
+    output_size=env.action_space.shape[0],
+    hidden_sizes=[64, 64],
+    activation=nn.Tanh
+)
 
-env.reset()
-first_target = env._target_pos
-env.reset()
-second_target = env._target_pos
-assert (first_target == second_target).all()
+value_net = MLPNetwork(
+    input_size=env.observation_space.shape[0],
+    output_size=1,
+    hidden_sizes=[64, 64],
+    activation=nn.Tanh
+)
 
-env.reset()
-env2.reset()
-assert (env._target_pos == env2._target_pos).all()
+# Create the PPO loss module
+ppo_loss = PPOLoss(
+    actor_network=policy_net,
+    critic_network=value_net,
+    entropy_bonus=True,
+    entropy_coef=0.01,
+    critic_coef=1.0,
+    loss_critic_type="smooth_l1",
+    normalize_advantage=True,
+    functional=True,
+)
 
-env3 = env_cls(seed=10)
-env.reset()
-env3.reset()
-assert not (env._target_pos == env3._target_pos).all()
+# Train the agent
+optimizer = torch.optim.Adam(ppo_loss.parameters(), lr=3e-4)
 
-print(type(env))
+for episode in range(1000):
+    obs = env.reset()
+    done = False
+    while not done:
+        action, log_prob, value = ppo_loss.actor_network(obs)
+        next_obs, reward, done, _ = env.step(action)
+        ppo_loss.eval(
+            obs=obs,
+            action=action,
+            reward=reward,
+            next_obs=next_obs,
+            done=done,
+            value=value,
+            log_prob=log_prob,
+        )
+        obs = next_obs
 
-# Initialize the PPO trainer
-policy = MLPPolicy(env.observation_space.shape[0], env.action_space.shape[0], hidden_sizes=[64, 64])
-trainer = PPO(policy, env, n_epochs=100, batch_size=32)
+    ppo_loss.update()
+    optimizer.zero_grad()
+    loss = ppo_loss()
+    loss.backward()
+    optimizer.step()
 
-# Initialize Mujoco viewer
-print("Initializing Mujoco viewer...")
-with mujoco.viewer.launch_passive(env.model, env.data) as viewer:
-    print("Viewer initialized successfully.")
-    # Train the model on each step
-    start = time.time()
-    time.sleep(0.01)
-    num_steps = 10000
-    for step in range(num_steps):
-        # Perform one step of the environment
-        action = trainer.predict(observation)
-        observation, reward, done, info, _ = env.step(action)
-        
-        # Render the environment
-        viewer.sync()
-        
-        # Update the trainer
-        trainer.step(observation, action, reward, done)
-        
-        # Check if episode is done
-        if done:
-            observation = env.reset()
-    
-    # Log elapsed time
-    elapsed_time = time.time() - start
-    print("Training time:", elapsed_time)
+    print(f"Episode {episode}, Reward: {ppo_loss.episode_reward}")

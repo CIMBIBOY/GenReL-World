@@ -7,11 +7,11 @@ import time
 import matplotlib.pyplot as plt
 import wandb
 
-from .actor_criticv2 import ActorNetwork, CriticNetwork
+from .network.actor_critic import LSTMActorNetwork, LSTMCriticNetwork
 
 from torch.utils.tensorboard import SummaryWriter
 
-class PPO:
+class DQN:
     def __init__(self, env, num_episodes, wandb_use=True, hidden_size=128, lr=3e-4, gamma=0.99, lam=0.95, clip_range=0.2, num_epochs=10, batch_size=32, epsilon = 0.1, entropy_coef=0.01, noise_std=0.1, exploration_decay=-5e-6):
         self.env = env
 
@@ -26,8 +26,8 @@ class PPO:
         self.action_size = env.action_space.shape[0] # action metrics 
         self.batch_size = batch_size
 
-        self.actor_net = ActorNetwork(self.state_size, self.action_size, hidden_size)
-        self.critic_net = CriticNetwork(self.state_size, hidden_size)
+        self.actor_net = LSTMActorNetwork(self.state_size, self.action_size, hidden_size)
+        self.critic_net = LSTMCriticNetwork(self.state_size, hidden_size)
         self.actor_hidden = (torch.zeros(1, self.batch_size, self.actor_net.lstm.hidden_size),
                             torch.zeros(1, self.batch_size, self.actor_net.lstm.hidden_size))
         self.critic_hidden = (torch.zeros(1, self.batch_size, self.critic_net.lstm.hidden_size),

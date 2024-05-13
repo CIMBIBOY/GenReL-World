@@ -13,12 +13,13 @@ import torch
 import torch.nn as nn
 from torch.optim import Adam
 from torch.distributions import MultivariateNormal
+import wandb
 
 class PPO:
 	"""
 		This is the PPO class we will use as our model in main.py
 	"""
-	def __init__(self, policy_class, env, **hyperparameters):
+	def __init__(self, policy_class, env, wandb_use=True, **hyperparameters):
 		"""
 			Initializes the PPO model, including hyperparameters.
 
@@ -49,7 +50,7 @@ class PPO:
 		# Initialize optimizers for actor and critic
 		self.actor_optim = Adam(self.actor.parameters(), lr=self.lr)
 		self.critic_optim = Adam(self.critic.parameters(), lr=self.lr)
-
+	
 		# Initialize the covariance matrix used to query the actor for actions
 		self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
 		self.cov_mat = torch.diag(self.cov_var)
@@ -63,6 +64,10 @@ class PPO:
 			'batch_rews': [],       # episodic returns in batch
 			'actor_losses': [],     # losses of actor network in current iteration
 		}
+		self.wandb_use = wandb_use
+		if(self.wandb_use==True):
+			self.wandb_run = wandb.init(project="moonlanderPPO", entity="czimbermark")
+			self.wandb_config = wandb.config
 
 	def learn(self, total_timesteps):
 		"""
@@ -184,6 +189,8 @@ class PPO:
 
 			# Reset the environment. sNote that obs is short for observation. 
 			obs = self.env.reset()
+			if isinstance(obs, tuple): 
+				obs = obs[0]  # Assuming the first element of the tuple is the relevant data
 			done = False
 
 			# Run an episode for a maximum of max_timesteps_per_episode timesteps
@@ -196,11 +203,11 @@ class PPO:
 
 				# Track observations in this batch
 				batch_obs.append(obs)
-
+				
 				# Calculate action and make a step in the env. 
 				# Note that rew is short for reward.
 				action, log_prob = self.get_action(obs)
-				obs, rew, done, _ = self.env.step(action)
+				obs, rew, done, info, _ = self.env.step(action)
 
 				# Track recent reward, action, and action log probability
 				ep_rews.append(rew)
@@ -208,7 +215,7 @@ class PPO:
 				batch_log_probs.append(log_prob)
 
 				# If the environment tells us the episode is terminated, break
-				if done:
+				if done or info:
 					break
 
 			# Track episodic lengths and rewards
@@ -392,6 +399,17 @@ class PPO:
 		print(f"Iteration took: {delta_t} secs", flush=True)
 		print(f"------------------------------------------------------", flush=True)
 		print(flush=True)
+
+		if(self.wandb_use == True):
+			# Log the metrics to wandb
+			wandb.log({
+				"Iteration": i_so_far,
+				"Average Episodic Length": float(avg_ep_lens),
+				"Average Episodic Return": float(avg_ep_rews),
+				"Average Actor Loss": float(avg_actor_loss),
+				"Timesteps So Far": t_so_far,
+				"Iteration Time (s)": float(delta_t)
+			})
 
 		# Reset batch-specific logging data
 		self.logger['batch_lens'] = []
