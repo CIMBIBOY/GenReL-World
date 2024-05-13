@@ -1,0 +1,1 @@
+{"Iteration": 50, "Average Episodic Length": 200.0, "Average Episodic Return": 4.85, "Average Actor Loss": -0.00107, "Timesteps So Far": 110000, "Iteration Time (s)": 33.7, "_timestamp": 1715514150.987126, "_runtime": 1725.7765531539917, "_step": 49, "_wandb": {"runtime": 1735}}

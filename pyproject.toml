@@ -28,7 +28,6 @@ jax = "^0.4.26"
 flax = "^0.8.2"
 optax = "^0.2.2"
 tensorflow = "^2.16.1"
-mujoco = "^3.1.4"
 metaworld = "^0.0.1.dev0"
 imageio = "^2.34.0"
 torchrl = { git = "https://github.com/pytorch/rl.git" }
@@ -43,10 +42,12 @@ tensorflow-probability = "^0.24.0"
 keras = "^3.3.2"
 tf-keras = "^2.16.0"
 wandb = "^0.16.6"
-gym = "^0.17.3"
-pyglet = "^1.5.0"
-gymnasium = "^0.29.1"
+gymnasium = {extras = ["box2d"], version = "^0.29.1"}
 stable-baselines3 = "^2.3.2"
+pyopengl = "^3.1.7"
+gym = "^0.26.2"
+pyglet = "^2.0.15"
+mujoco = "^3.1.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

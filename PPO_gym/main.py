@@ -10,7 +10,7 @@ import torch
 
 from arguments import get_args
 from ppo import PPO
-from network import FeedForwardNN
+from network import FeedForwardNN, LstmNN
 from eval_policy import eval_policy
 
 # python PPO_gym/main.py
@@ -18,7 +18,7 @@ from eval_policy import eval_policy
 def train(env, hyperparameters, actor_model, critic_model):
 	"""
 		Trains the model.
-
+x
 		Parameters:
 			env - the environment to train on
 			hyperparameters - a dict of hyperparameters to use, defined in main
@@ -31,7 +31,7 @@ def train(env, hyperparameters, actor_model, critic_model):
 	print(f"Training", flush=True)
 
 	# Create a model for PPO.
-	model = PPO(policy_class=FeedForwardNN, env=env, **hyperparameters)
+	model = PPO(policy_class=LstmNN, env=env, wandb_use=True, **hyperparameters)
 
 	# Tries to load in an existing actor/critic model to continue training on
 	if actor_model != '' and critic_model != '':
@@ -102,7 +102,7 @@ def main(args):
 				'max_timesteps_per_episode': 200, 
 				'gamma': 0.99, 
 				'n_updates_per_iteration': 10,
-				'lr': 3e-4, 
+				'lr': 3e-5, 
 				'clip': 0.2,
 				'render': True,
 				'render_every_i': 10
@@ -111,7 +111,7 @@ def main(args):
 	# Creates the environment we'll be running. If you want to replace with your own
 	# custom environment, note that it must inherit Gym and have both continuous
 	# observation and action spaces.
-	env = gym.make('Pendulum-v0')
+	env = gym.make('LunarLanderContinuous-v2', render_mode="human")
 
 	# Train or test, depending on the mode specified
 	if args.mode == 'train':

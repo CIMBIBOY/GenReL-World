@@ -79,7 +79,7 @@ class SawyerPickPlaceEnvV2(SawyerXYZEnv):
             obj_to_target,
             grasp_reward,
             in_place_reward,
-        ) = self.compute_reward(action, obs)
+        ) = self.own_compute_reward(action, obs)
         success = float(obj_to_target <= 0.07)
         near_object = float(tcp_to_obj <= 0.03)
         grasp_success = float(
@@ -273,23 +273,31 @@ class SawyerPickPlaceEnvV2(SawyerXYZEnv):
 
         # Add a reward for getting close to the object
         if tcp_to_obj < 0.05:
-            reward += 2.0
+            reward += 0.5
         elif tcp_to_obj < 0.1:
-            reward += 1.0
+            reward += 0.2
         else:
-            reward -= 0.5
+            reward -= 0.3
 
         # Add a larger reward for touching the object
         if self.touching_main_object:
-            reward += 5.0
+            reward += 1.0
 
+        high_lift = False
         # Add an even larger reward for lifting the object
         if obj[2] > self.obj_init_pos[2] + 0.05:
-            reward += 10.0
+            reward += 5.0
+        if obj[2] > self.obj_init_pos[2] + 0.2:
+            reward += 4.0
+            high_lift = True
 
         # Add a large reward for successfully completing the task
         if obj_to_target < _TARGET_RADIUS:
-            reward = 20.0
+            reward += 15.0
+
+        # Larger reward for successfully completing the task by lifting it there 
+        if obj_to_target < _TARGET_RADIUS and high_lift:
+            reward += 10.0
 
         return [reward, tcp_to_obj, tcp_opened, obj_to_target, object_grasped, in_place]
 

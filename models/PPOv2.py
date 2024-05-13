@@ -8,7 +8,9 @@ import matplotlib.pyplot as plt
 import wandb
 import statistics
 
-from .actor_critic import ActorNetwork, CriticNetwork
+from .network.actor_critic import LSTMActorNetwork,LSTMCriticNetwork
+from .network.actor_critic_linear import Agent
+from .network.GAE import GAE
 
 from torch.utils.tensorboard import SummaryWriter
 
@@ -18,7 +20,7 @@ class PPO:
 
         self.wandb_use = wandb_use
         if(self.wandb_use==True):
-            self.wandb_run = wandb.init(project="aitclassproject", entity="czimbermark")
+            self.wandb_run = wandb.init(project="pickplaceV2", entity="czimbermark")
             self.wandb_config = wandb.config
             self.wandb_config.num_episodes = num_episodes
             self.wandb_config.batch_size = batch_size
@@ -27,19 +29,28 @@ class PPO:
         self.action_size = env.action_space.shape[0] # action metrics 
         self.batch_size = batch_size
 
-        self.actor_net = ActorNetwork(self.state_size, self.action_size, hidden_size)
-        self.critic_net = CriticNetwork(self.state_size, hidden_size)
+        
+        self.actor_net = LSTMActorNetwork(self.state_size, self.action_size, hidden_size)
+        self.critic_net = LSTMCriticNetwork(self.state_size, 1, hidden_size)
         self.actor_hidden = (torch.zeros(1, self.batch_size, self.actor_net.lstm.hidden_size),
                             torch.zeros(1, self.batch_size, self.actor_net.lstm.hidden_size))
         self.critic_hidden = (torch.zeros(1, self.batch_size, self.critic_net.lstm.hidden_size),
                           torch.zeros(1, self.batch_size, self.critic_net.lstm.hidden_size))
         self.noise_std = noise_std
-        
+        '''
+        self.actor_net = Agent(env, hidden=hidden_size)
+        self.critic_net = Agent(env, hidden=hidden_size)
+        self.actor_hidden = (torch.zeros(1, self.batch_size, hidden_size),
+                            torch.zeros(1, self.batch_size, hidden_size))
+        self.critic_hidden = (torch.zeros(1, self.batch_size, hidden_size),
+                            torch.zeros(1, self.batch_size, hidden_size))
+        self.noise_std = noise_std
+        '''
         self.epsilon = epsilon # exploration value
         self.exploration_decay = exploration_decay
         self.clip_range = clip_range
         self.avg_return = -float('inf')  # Running average of episodic returns
-        self.target_return = 2500.0  # Target average episodic return
+        self.target_return = 500.0  # Target average episodic return
 
         # values for broader understanding
         self.episode_successes = deque(maxlen=100) 
@@ -56,12 +67,14 @@ class PPO:
         self.gamma = gamma
         self.lam = lam
         self.entropy_coef = entropy_coef
+        self.gae = GAE(n_workers=self.batch_size, worker_steps=1, gamma=self.gamma, lambda_=self.lam)
 
         self.episode_rewards = deque(maxlen=100)
         self.episode_lengths = deque(maxlen=100)
 
         self.writer = SummaryWriter()
 
+    '''
     # gae fro esstimating the advantage function
     # how much better or worse an action is compared to the expected value of the state
     # goal ->  effective policy updates 
@@ -76,54 +89,31 @@ class PPO:
             advantages[:, 0] = gae
 
         return advantages
-    
+    '''
    
     def update_critic(self, states, actions, rewards, dones, next_states):
         torch.autograd.set_detect_anomaly(True)
         with torch.set_grad_enabled(True):
             # stacking tensors, in lstm batch_first=True so stacking on dim=0 to achive (batc_size, seq_length, feature)
             states = torch.stack([torch.from_numpy(np.array(s)) for s in states], dim=0).float().unsqueeze(1) # adding seq lenght dim
-            actions = torch.stack([torch.from_numpy(np.array(a)) for a in actions])
-            rewards = torch.stack([torch.from_numpy(np.array(r)) for r in rewards])
-            dones = torch.stack([torch.from_numpy(np.array(d)) for d in dones])
+            actions = torch.stack([torch.from_numpy(np.array(a)) for a in actions]).float()
+            rewards = torch.stack([torch.from_numpy(np.array(r)) for r in rewards]).float().unsqueeze(1)
+            dones = torch.stack([torch.from_numpy(np.array(d)) for d in dones]).float().unsqueeze(1)
             next_states = torch.stack([torch.from_numpy(np.array(ns)) for ns in next_states], dim=0).float().unsqueeze(1)
 
-            ''' debug
-            print(states.dim())
-            print(actions.dim())
-            print(rewards.dim())
-            print(dones.dim())
-            print(next_states.dim())
-            print(states.shape)
-            print(actions.shape)
-            print(rewards.shape)
-            print(dones.shape)
-            print(next_states.shape)
-
-            print(f"States shape: {states.shape}")
-            print(f"Critic hidden shape: {self.critic_hidden[0].shape}, {self.critic_hidden[1].shape}")
-            '''
-
             # Compute values and advantages for the entire batch
-            value, self.critic_hidden = self.critic_net(states, self.critic_hidden)
-            next_value, _ = self.critic_net(next_states, self.critic_hidden)
+            values, self.critic_hidden = self.critic_net(states, self.critic_hidden)
+            next_values, _ = self.critic_net(next_states, self.critic_hidden)
 
-            ''' debug
-            print(value.dim())
-            print(next_value.dim())
-            print(rewards.dim())
-            print(dones.dim())
-            print(value.shape)
-            print(next_value.shape)
-            print(rewards.shape)
-            print(dones.shape)
-            '''
+            values = values.squeeze(1).float() # removing seq_len dim=1
+            next_values = next_values.squeeze(1).float()
 
-            advantages = self.compute_gae(rewards, value.squeeze(1), next_value.squeeze(1), dones)
-            advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+            advantages = self.gae(dones.numpy(), rewards.numpy(), values.detach().numpy())
+            advantages = torch.from_numpy(advantages).to(values.device)
+            advantages = (advantages - advantages.mean() + 1e-8) / (advantages.std() + 1e-8)
 
             # Update the critic network
-            self.critic_loss = nn.SmoothL1Loss()(value.squeeze(1), rewards.unsqueeze(1) + self.gamma * next_value.squeeze(1) * torch.logical_not(dones).unsqueeze(1)) 
+            self.critic_loss = nn.SmoothL1Loss()(values, rewards + self.gamma * next_values * torch.logical_not(dones)) 
             self.critic_optimizer.zero_grad() 
             self.critic_loss.backward(retain_graph=True) # retain_graph=True
             self.critic_optimizer.step()
@@ -139,11 +129,6 @@ class PPO:
         with torch.set_grad_enabled(True):
             states = torch.stack([torch.from_numpy(np.array(s)) for s in states], dim=0).float().unsqueeze(1)
             actions = torch.stack([torch.from_numpy(np.array(a)) for a in actions])
-            
-            ''' debug
-            print(states.dim())
-            print(states.shape)
-            '''
 
             # Compute the current action probabilities
             current_action_probs, self.actor_hidden = self.actor_net(states, self.actor_hidden)
@@ -160,7 +145,7 @@ class PPO:
             self.actor_loss = self.actor_loss - self.entropy_coef * current_action_probs.mean()
 
             self.actor_optimizer.zero_grad()
-            grads = torch.autograd.grad(self.actor_loss, self.actor_net.parameters(), retain_graph=True)
+            grads = torch.autograd.grad(self.actor_loss, self.actor_net.parameters())
             for param, grad in zip(self.actor_net.parameters(), grads):
                 param.grad = grad
             torch.nn.utils.clip_grad_norm_(self.actor_net.parameters(), 0.5) # retain_graph=True
@@ -271,8 +256,7 @@ class PPO:
                 else:
                     # Decay the exploration rate using adaptive decay
                     self.epsilon = max(0.1, 1.0 - (abs(self.avg_return) / self.target_return))
-                    if not first_ppo:
-                        print(f"Epsilon init value: {self.epsilon}")
+                    if(self.epsilon < 0.1): self.epsilon = 0.1 
                     #  Exploration strategy
                     if np.random.rand() < self.epsilon:
                         action = self.env.action_space.sample()
