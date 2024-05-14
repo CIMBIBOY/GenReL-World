@@ -25,14 +25,13 @@ __Table of Contents__
 
 __GenReL-World is a general Reinforcement Learning framework to utilize various world models as environments for robot manipulation.__
 
-The goal is to contrust the framework which utilizes general reinforcement learning algorithms to teach and control a robotic in it's given environment for it's given task. 
+The goal is to contrust the framework which utilizes general reinforcement learning algorithms to teach and control a robot in it's given environment for it's given task. 
 A big problem in robotics is, that agents adapt hardly to new environments or tasks, which fall out of the trained task distribution. 
-The adaptation of a general framework can be worthwhile if they can be trained on different world models (laten representations) and environments, tested on hyperparameters and initial conditions and using different reward and action space constructions. 
+The adaptation of a general framework can be worthwhile if they can be trained on different world models (latent representations) and environments, tested on hyperparameters and initial conditions and using different reward and action space constructions. 
 
-With that only the world model and the encoding of the lower latent representation have to be repleaced. 
 Implementing different algorithms and finding connections between them is an ongoing research area, which can play a crutial part in robotics.
-Also data structures, exploration function and the definition of state, reward and action spaces can impact the learning of an agent.
-The project focuses on different intitial values, action and rewards spaces and the change of agents behaviour in different environments.
+Also data structures, exploration functions and the definition of state, reward and action spaces can impact the learning of an agent.
+The research focuses on different intitial values, action and rewards spaces and the change of agents behaviour in different environments.
 
 The framework involves reinforcement learning concepts from [(0)](https://www.andrew.cmu.edu/course/10-703/textbook/BartoSutton.pdf) and meta-reinforcement learning and multi-task learning using the MetaWorld open-source simulated benchmark [(1)](https://meta-world.github.io/). 
 
