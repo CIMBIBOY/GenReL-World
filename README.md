@@ -85,8 +85,8 @@ Here is a list of github repositories of the used sources:
 * [MuJoCo](https://github.com/google-deepmind/mujoco) is a general purpose physics engine that aims to facilitate research and development in robotics, biomechanics, graphics and animation, machine learning, and other areas. 
 * [MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie) is a collection of high-quality models for the MuJoCo physics engine including models that work well right out of the gate.
 * [TorchRL](https://github.com/pytorch/rl) is an open-source Reinforcement Learning (RL) library for PyTorch.
-* [Cleanrl](https://github.com/vwxyzjn/cleanrl) is a Deep Reinforcement Learning library that provides high-quality single-file implementation with research-friendly features. 
-* [Gymnasium](https://gymnasium.farama.org/) is an open source Python library for developing and comparing reinforcement learning algorithms by providing a standard API to communicate between learning algorithms and environments
+* [Cleanrl](https://github.com/vwxyzjn/cleanrl) is a Deep Reinforcement Learning library based on the Gymnasium API that provides high-quality single-file implementation with research-friendly features. 
+* [Gymnasium](https://gymnasium.farama.org/) is an open source Python library for developing and comparing reinforcement learning algorithms by providing a standard API to communicate between learning algorithms and environments.
 * [BasicPPO](https://github.com/ericyangyu/PPO-for-Beginners) is Eric Yu's help to beginners to get started in writing Proximal Policy Optimization (PPO) from scratch using PyTorch. 
 
 ### MetaWorld
