@@ -7,10 +7,17 @@ __Table of Contents__
 - [Abstract](#abstract)
 - [Project Work](#project-work)
 - [Setup](#setup)
-- [Installation of Bases](#installation-of-bases)
+- [Frameworks](#frameworks)
   * [MetaWorld](#metaworld)
   * [MuJoCo](#mujoco)
   * [MuJoCo Menagerie](#mujoco-menagerie)
+  * [TorchRL](#torchrl)
+  * [CleanRL](#cleanrl)
+  * [Gymnasium](#gymnasium)
+  * [Basic PPO](#basic-ppo)
+- [Usage and Training](#usage-and-training)
+- [Evaluation](#evaluation)
+- [Improvements](#improvements)
 - [References](#references)
 - [Credits](#credits)
 
@@ -20,10 +27,11 @@ __GenReL-World is a general Reinforcement Learning framework to utilize various 
 
 The goal is to contrust the framework which utilizes general reinforcement learning algorithms to control a robotic arm. 
 A big problem in robotics is, that they adapt hardly to new environments or to task, which fall out to the trained task distribution. 
-The adaptation of a general framework can be worthwhile if they can be intagrated to be trained on different world models. 
+The adaptation of a general framework can be worthwhile if they can be intagrated to be trained on different world models, environments, hyperparameters and initial conditions. 
 
-With that only the world model and the encoding to a lower latent representation have to be switched. 
-Implementing the different algorithms and finding connections between them is an ongoing research area, which can play a crutial part in robotics. 
+With that only the world model and the encoding to a lower latent representation have to be repleaced. 
+Implementing the different algorithms and finding connections between them is an ongoing research area, which can play a crutial part in robotics.
+The definition of intitial value problems, action and rewards spaces and optimizing various agents can be a handful.
 
 The framework involves reinforcement learning concepts from [(0)](https://www.andrew.cmu.edu/course/10-703/textbook/BartoSutton.pdf) and meta-reinforcement learning and multi-task learning using the MetaWorld open-source simulated benchmark [(1)](https://meta-world.github.io/). 
 
@@ -31,63 +39,177 @@ The project utilizes Google DeepMinds's MuJoCo (Multi-Joint dynamics with Contac
 
 The project also includes a built 7 degree of freedom robotic arm which is simulated with MuJoCo Menagerie's xArm7 (or some other model) as a part of the collection of high-quality models for the MuJoCo physics engine, curated by Google DeepMind [(3)](https://github.com/google-deepmind/mujoco_menagerie) [(4)](https://github.com/google-deepmind/mujoco_menagerie/tree/main/ufactory_xarm7). 
 
+Different algorithm objectivers have been consider as the open community provides better and better solutions and implementations, such as torchrl and cleanrl and also Basic [PPO](https://github.com/ericyangyu/PPO-for-Beginners) algorithms.
+
 We also share the dream of Yann LeCun about how to construct autonomous intelligent agents [(5)](https://openreview.net/pdf?id=BZ5a1r-kVsf).
 
 ## Project Work 
 
-__The project is conducted by Mark Czimber and Josh Kang__
+__The project is conducted by Mark Czimber__
 
 The bases of GenReL-World is part of the 2024 Deep Learning class of Aquincum Institute of Technology project work. 
-The first milestones include simple implementations of reinforcement learning algorithms for example along with meta reinforcement learning. 
+The project is based on various frameworks and algorithms to understand general reinforcement learning behaviour, to later implement Model Predictive Control or integrate World Models. Training various environments with basic agents to understand the differences between different parametrizations and initial values.  
 
-These will be used to simpler task such as moving objects and controlling a robotic arm in a virtual environment. 
-This can later be scaled by the mixing of different algorithms and implementations of new approaches. 
+Agents are trained on simpler tasks such as MoonLander and also in complex envrionments such as MetaWorld. Taught to land or control a robotic arm in a virtual environment. 
+This can later be scaled by the mixing of different algorithms and implementations, hopefully even new approaches. 
 
-Several ongoing reasearch papers are taken into account during the development of the project [(5)](https://openreview.net/pdf?id=BZ5a1r-kVsf) [(6)](https://arxiv.org/abs/2301.08028) [(7)](https://arxiv.org/abs/2010.02193).  
+Several ongoing reasearch papers are taken into account during the development of the project [(5)](https://openreview.net/pdf?id=BZ5a1r-kVsf) [(6)](https://arxiv.org/abs/2301.08028) [(7)](https://arxiv.org/abs/2010.02193) [(8)](https://github.com/ericyangyu/PPO-for-Beginners).  
 
 ## Setup
 
 GenReL-World is based on [python3](https://www.python.org/downloads/) high-level language, which is widely used for reinforcement learning. 
 The project also requires several python library dependencies which can be installed from [PyPI](https://pypi.org/) using the pip install "required library" terminal command. 
 
-The most important libraries for the project, which needs to be installed are: metaworld, mujaco, torch, gymnasium, scipy and numpy.
+The most important libraries for the project, which needs to be installed is poetry whcih is a version control package
 
-## Installation of Bases
+First steps:
+```
+git clone https://github.com/CIMBIBOY/GenReL-World.git
+cd GenReL-World 
+pip install poetry
+poetry shell 
+```
+
+Configure the python interpreter to ('.venv': Poetry, by adding path to Enter Interpreter Path section, usually at "parent_folder_path"/GenReL-World/.venv/bin/python3
+Installation steps after shell is active: 
+```
+poetry update
+pip install -r requirements.txt
+```
+
+## Frameworks
 Here is a list of github repositories of the used sources: 
 
 * [MetaWorld](https://meta-world.github.io/) is an open-source simulated benchmark for meta-reinforcement learning and multi-task learning. 
 * [MuJoCo](https://github.com/google-deepmind/mujoco) is a general purpose physics engine that aims to facilitate research and development in robotics, biomechanics, graphics and animation, machine learning, and other areas. 
 * [MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie) is a collection of high-quality models for the MuJoCo physics engine including models that work well right out of the gate.
+* [TorchRL](https://github.com/pytorch/rl) is an open-source Reinforcement Learning (RL) library for PyTorch.
+* [Cleanrl](https://github.com/vwxyzjn/cleanrl) is a Deep Reinforcement Learning library that provides high-quality single-file implementation with research-friendly features. 
+* [Gymnasium](https://gymnasium.farama.org/) is an open source Python library for developing and comparing reinforcement learning algorithms by providing a standard API to communicate between learning algorithms and environments
+* [BasicPPO](https://github.com/ericyangyu/PPO-for-Beginners) is Eric Yu's help to beginners to get started in writing Proximal Policy Optimization (PPO) from scratch using PyTorch. 
 
 ### MetaWorld
-To install MetaWorld follow the [installation steps](https://github.com/Farama-Foundation/Metaworld?tab=readme-ov-file#installation).
-The README of MetaWorld is a worthwhile read which can be found [here](https://github.com/Farama-Foundation/Metaworld/blob/master/README.md).
-
-A visualization of MetaWorld can be done in MuJoCo's 3D environment with running [testMetaW.py](https://github.com/CIMBIBOY/GenReL-World/blob/main/testMetaW.py). 
-It is advised to create the testMetaW.py in the instalaltion folder of MetaWorld: /path/to//metaworld here create testMetaW.py. 
-
-The python script can be run with mjpython from a terminal window by finding the path to mujoco instalaltion: /path/to/mujoco/bin/mjpython. 
-If the file does not have the execute permission, it can be added by running: chmod +x /path/to/testMetaW.py. 
-
-To run use: mjpython /path/to/testMetaW.py. The script intagrates MetaWorld's ML1 into MuJoCo for visualization. 
+A visualization of MetaWorld can be done in MuJoCo's 3D environment with running:
+```
+mjpython test_env/testMetaW.py
+```
+The script intagrates MetaWorld's pick-place-v2-goal-observable into MuJoCo for visualization. 
 
 ### MuJoCo
 To install MuJoCo follow installation steps on the [MuJoCo github](https://github.com/google-deepmind/mujoco) page. 
-For python users this is a simple installation from PyPI as pip install mujaco. 
+For python users this is a simple installation from PyPI as pip install mujaco, already added by poetry. 
 MuJoCo can also be downloaded from the [offical site](https://mujoco.org/).
 
 ### MuJoCo Menagerie
-To install MuJoCo Menagerie follow the installation steps on the [MuJoCo Menagerie github](https://github.com/google-deepmind/mujoco_menagerie/tree/main?tab=readme-ov-file#installation-and-usage). To visalize xArm7 run the [testxArm7.py](https://github.com/CIMBIBOY/GenReL-World/blob/main/testxArm7.py). 
-It is advised to create the testxArm7.py in the instalaltion folder of MetaWorld: /path/to//metaworld here create testxArm7.py.
+To install MuJoCo Menagerie follow the installation steps on the [MuJoCo Menagerie github](https://github.com/google-deepmind/mujoco_menagerie/tree/main?tab=readme-ov-file#installation-and-usage). 
 
-The path to xArm7's xml file have to be specified in testxArm7.py in line: 
-mujoco.MjModel.from_xml_path('/path/to/mujoco_menagerie/ufactory_xarm7/xarm7.xml'). 
+To visalize xArm7 run:
+```
+mjpython test_env/testxArm7.py
+```
 
-The python script can be run with mjpython from a terminal window by finding the path to mujoco instalaltion: /path/to/mujoco/bin/mjpython. If the file does not have the execute permission, it can be added by running: chmod +x /path/to/testxArm7.py. 
-
-To run use: mjpython /path/to/testxArm7.py. The script intagrates xArm7 xml into MuJoCo for visualization. 
+The script intagrates xArm7 xml into MuJoCo for visualization. 
 
 The xarm7.xml can also be dragged to MuJoCo app downloaded from the official cite.
+
+### TorchRL
+Is the implementation go-to if coding from scratch, it also comes with a set of highly re-usable functionals for cost functions, returns and data processing.
+
+### Cleanrl
+Clean and simple implementations of RL algorithms, yet scaleable to run thousands of experiments using AWS Batch.
+
+### Gymnasium
+[Gymnasium](https://github.com/Farama-Foundation/Gymnasium) is OpenAI's Gym's future maintance which is an elegant and very useful libary for RL environments.
+
+### Basic PPO
+Huge thanks to the author, is a clean and easily understandable code, I ran quite a few trains with different environments and hyperparameters on the PPO!
+
+## Usage and Training
+In case of any errors due to sys path definition please redefine your location as path variable.
+
+Different rewards can be defined for MetaWorld Pick-Place-v2 in GenReL-World/metaworld/envs/mujoco/sawyer_xyz/v2/sawyer_pick_place_v2.py
+Currently there is a MetaWorld and a slef logic impmeneted compute_reward function.
+
+__To train algorithms on different environments run:__
+
+From scratch PPO on MoonLanderContinuous-v2:
+"Under correction"
+```
+python train/traingymPPO.py
+```
+
+From scratch PPO on MetaWorld Pick-Place-v2:
+"Under correction"
+```
+mjpython train/trainMetaWPPO.py
+```
+
+Basic PPO on MoonLanderContinuous-v2::
+"Good evaluation"
+To train from scratch:
+```
+python PPO_gym/main.py
+```
+
+To test best model from saved weights: 
+```
+python PPO_gym/main.py --mode test --actor_model ppo_actor.pth
+```
+
+To train best model from saved weights: 
+```
+python PPO_gym/main.py --actor_model ppo_actor.pth --critic_model ppo_critic.pth
+```
+
+Modified Basic PPO on MetaWorld Pick-Place-v2:
+"Struggle because of task complexity"
+To train from scratch:
+```
+mjpython PPO_metaW/main.py
+```
+
+To test best model from saved weights: 
+```
+mjpython PPO_metaW/main.py --mode test --actor_model ppo_actor.pth
+```
+
+To train best model from saved weights: 
+"MetaWorld predefined reward"
+```
+mjpython PPO_metaW/main.py --actor_model ppo_meta_actor.pth --critic_model ppo_meta_critic.pth
+```
+
+"Own reward system"
+```
+mjpython PPO_metaW/main.py --actor_model ppo_meta_actor_v4.pth --critic_model ppo_meta_critic_v4.pth
+```
+
+Garage PPO on MetaWorld Pick-Place-v2:
+"Currently fails"
+```
+mjpython train/train_garagePPOv2.py
+```
+
+TorchRL PPO on MetaWorld Pick-Place-v2:
+"Currently fails"
+```
+mjpython train/train_torchrl.py
+```
+
+## Evaluation
+Evaluation is done by testing learned policy for environments and Weights and Biases monitoring. Own Wandb config can be defined in each models PPO Agent init class, and also use of logging can be switched on-of by the use of wand_use=True or False setting.
+
+Wandb graphs and visualizations can be found in the [documentation](docs)
+
+## Improvements 
+The project focuses on hyperparameters and initial settings of simple RL models, which allows different setting to be tried. 
+Trains are conducted on a Mac M2 chip, which is not the fastest GPU to train with. 
+Improvement can be done by fixing the scratch PPO implementation and further hyperparamter optimalization.
+Utilizing torchrl's, cleanrl's and garage's models can provide more information of agent's behavior in different world/environment settings. 
+Model Predictive Control can provide a better understanding of the latent embedding of the environment.
+Parametrized or infinite action spaces can be considered, which is one of my research area. 
+Different Agents can be implemented for better performance. 
+Testing of various reward fucntions can further improve model performance. 
 
 ## References 
 
@@ -142,6 +264,8 @@ MuJoCo Menagerie:
 [(6)](https://arxiv.org/abs/2301.08028) Jacob Beck et al. (2023). A Survey of Meta-Reinforcement Learning. arXiv:2301.08028 [cs.LG].
 
 [(7)](https://arxiv.org/abs/2010.02193) Danijar Hafner et al. (2020).	Mastering Atari with Discrete World Models. arXiv:2010.02193 [cs.LG].
+
+[(8)](https://github.com/ericyangyu/PPO-for-Beginners) Eric Yang Yu, (2023). PPO for Beginners.
 
 ## Credits 
 
