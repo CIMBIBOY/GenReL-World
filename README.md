@@ -25,13 +25,14 @@ __Table of Contents__
 
 __GenReL-World is a general Reinforcement Learning framework to utilize various world models as environments for robot manipulation.__
 
-The goal is to contrust the framework which utilizes general reinforcement learning algorithms to control a robotic arm. 
-A big problem in robotics is, that they adapt hardly to new environments or to task, which fall out to the trained task distribution. 
-The adaptation of a general framework can be worthwhile if they can be intagrated to be trained on different world models, environments, hyperparameters and initial conditions. 
+The goal is to contrust the framework which utilizes general reinforcement learning algorithms to teach and control a robotic in it's given environment for it's given task. 
+A big problem in robotics is, that agents adapt hardly to new environments or tasks, which fall out of the trained task distribution. 
+The adaptation of a general framework can be worthwhile if they can be trained on different world models (laten representations) and environments, tested on hyperparameters and initial conditions and using different reward and action space constructions. 
 
-With that only the world model and the encoding to a lower latent representation have to be repleaced. 
-Implementing the different algorithms and finding connections between them is an ongoing research area, which can play a crutial part in robotics.
-The definition of intitial value problems, action and rewards spaces and optimizing various agents can be a handful.
+With that only the world model and the encoding of the lower latent representation have to be repleaced. 
+Implementing different algorithms and finding connections between them is an ongoing research area, which can play a crutial part in robotics.
+Also data structures, exploration function and the definition of state, reward and action spaces can impact the learning of an agent.
+The project focuses on different intitial values, action and rewards spaces and the change of agents behaviour in different environments.
 
 The framework involves reinforcement learning concepts from [(0)](https://www.andrew.cmu.edu/course/10-703/textbook/BartoSutton.pdf) and meta-reinforcement learning and multi-task learning using the MetaWorld open-source simulated benchmark [(1)](https://meta-world.github.io/). 
 
@@ -39,9 +40,9 @@ The project utilizes Google DeepMinds's MuJoCo (Multi-Joint dynamics with Contac
 
 The project also includes a built 7 degree of freedom robotic arm which is simulated with MuJoCo Menagerie's xArm7 (or some other model) as a part of the collection of high-quality models for the MuJoCo physics engine, curated by Google DeepMind [(3)](https://github.com/google-deepmind/mujoco_menagerie) [(4)](https://github.com/google-deepmind/mujoco_menagerie/tree/main/ufactory_xarm7). 
 
-Different algorithm objectivers have been consider as the open community provides better and better solutions and implementations, such as torchrl and cleanrl and also Basic [PPO](https://github.com/ericyangyu/PPO-for-Beginners) algorithms.
+Different algorithm objectives have been consider as the open community provides better and better solutions and implementations, such as torchrl and cleanrl and also Basic [PPO](https://github.com/ericyangyu/PPO-for-Beginners) algorithms.
 
-We also share the dream of Yann LeCun about how to construct autonomous intelligent agents [(5)](https://openreview.net/pdf?id=BZ5a1r-kVsf).
+I also share the dream of Yann LeCun about how to construct autonomous intelligent agents [(5)](https://openreview.net/pdf?id=BZ5a1r-kVsf).
 
 ## Project Work 
 
