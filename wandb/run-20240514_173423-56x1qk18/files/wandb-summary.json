@@ -1,1 +1,1 @@
-{"Iteration": 2208, "Average Episodic Length": 200.0, "Average Episodic Return": 1366.3, "Average Actor Loss": -0.00638, "Timesteps So Far": 4857600, "Iteration Time (s)": 155.72, "_timestamp": 1715810019.4999979, "_runtime": 109156.03306794167, "_step": 2207}
+{"Iteration": 2231, "Average Episodic Length": 200.0, "Average Episodic Return": 1192.93, "Average Actor Loss": -0.01145, "Timesteps So Far": 4908200, "Iteration Time (s)": 67.7, "_timestamp": 1715811736.7863019, "_runtime": 110873.3193719387, "_step": 2230}
