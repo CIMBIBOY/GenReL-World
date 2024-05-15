@@ -1,0 +1,49 @@
+{
+    "os": "macOS-14.4.1-arm64-arm-64bit",
+    "python": "3.11.7",
+    "heartbeatAt": "2024-05-14T15:34:28.956628",
+    "startedAt": "2024-05-14T15:34:23.458951",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World/PPO_metaW/main.py",
+    "codePathLocal": "PPO_metaW/main.py",
+    "codePath": "PPO_metaW/main.py",
+    "git": {
+        "remote": "https://github.com/CIMBIBOY/GenReL-World.git",
+        "commit": "683f71baa3d1f3f257f5566d0695e1b7ce5c1d80"
+    },
+    "email": "czimbermark@gmail.com",
+    "root": "/Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World",
+    "host": "Hero.local",
+    "username": "czimbermark",
+    "executable": "/Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World/.venv/bin/python",
+    "cpu_count": 8,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 3504,
+        "min": 600,
+        "max": 3504
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3504,
+            "min": 600,
+            "max": 3504
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 460.4317207336426,
+            "used": 9.54098892211914
+        }
+    },
+    "gpuapple": {
+        "type": "arm",
+        "vendor": "Apple"
+    },
+    "memory": {
+        "total": 16.0
+    }
+}

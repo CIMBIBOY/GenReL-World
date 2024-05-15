@@ -6,7 +6,7 @@ import ctypes
 
 # source /Users/czimbermark/Documents/Reinf/MetaWorld/GenReL-World/.venv/bin/activate
 
-m = mujoco.MjModel.from_xml_path('/Users/czimbermark/Documents/Reinf/MuJoCo_Menagerie/mujoco_menagerie/ufactory_xarm7/xarm7.xml')
+m = mujoco.MjModel.from_xml_path('GenReL-World/test_env/xarm7.xml')
 d = mujoco.MjData(m)
 
 with mujoco.viewer.launch_passive(m, d) as viewer:

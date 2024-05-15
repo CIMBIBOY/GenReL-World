@@ -13,7 +13,7 @@ from metaworld.envs import ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE
 # from scratch
 # mjpython PPO_metaW/main.py
 # from existing: 
-# mjpython PPO_metaW/main.py --actor_model ppo_meta_actor.pth --critic_model ppo_meta_critic.pth
+# mjpython PPO_metaW/main.py --actor_model ppo_meta_actor_v7.pth --critic_model ppo_meta_critic_v7.pth
 
 def main(args):
 	"""
@@ -32,8 +32,8 @@ def main(args):
 				'timesteps_per_batch': 2048, 
 				'max_timesteps_per_episode': 200, 
 				'gamma': 0.99, 
-				'n_updates_per_iteration': 30,
-				'lr': 2e-5, 
+				'n_updates_per_iteration': 20,
+				'lr': 6e-4, 
 				'clip': 0.2,
 				'render': True,
 				'render_every_i': 1
