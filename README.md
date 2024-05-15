@@ -170,13 +170,13 @@ mjpython PPO_metaW/main.py
 
 To test best model from saved weights: 
 ```
-mjpython PPO_metaW/main.py --mode test --actor_model ppo_actor.pth
+mjpython PPO_metaW/main.py --mode test --actor_model ppo_meta_actor.pth
 ```
 
 To train best model from saved weights: 
-"MetaWorld predefined reward"
+"MetaWorld defined reward"
 ```
-mjpython PPO_metaW/main.py --actor_model ppo_meta_actor.pth --critic_model ppo_meta_critic.pth
+mjpython PPO_metaW/main.py --actor_model ppo_meta_actor_v7.pth --critic_model ppo_meta_critic_v7.pth
 ```
 
 "Own reward system"
