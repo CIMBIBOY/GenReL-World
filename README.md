@@ -37,7 +37,7 @@ The framework involves reinforcement learning concepts from [(0)](https://www.an
 
 The project utilizes Google DeepMinds's MuJoCo (Multi-Joint dynamics with Contact) as a general purpose physics engine that aims to facilitate research and development in robotics. [(2)](https://mujoco.org/). 
 
-The project also includes a built 7 degree of freedom robotic arm which is simulated with MuJoCo Menagerie's xArm7 (or some other model) as a part of the collection of high-quality models for the MuJoCo physics engine, curated by Google DeepMind [(3)](https://github.com/google-deepmind/mujoco_menagerie) [(4)](https://github.com/google-deepmind/mujoco_menagerie/tree/main/ufactory_xarm7). 
+The project also includes a built 7 degree of freedom robotic arm which is simulated with MuJoCo Menagerie's xArm7 as a part of the collection of high-quality models for the MuJoCo physics engine, curated by Google DeepMind [(3)](https://github.com/google-deepmind/mujoco_menagerie) [(4)](https://github.com/google-deepmind/mujoco_menagerie/tree/main/ufactory_xarm7). 
 
 Different algorithm objectives have been consider as the open community provides better and better solutions and implementations, such as torchrl and cleanrl and also Basic [PPO](https://github.com/ericyangyu/PPO-for-Beginners) algorithms.
 
