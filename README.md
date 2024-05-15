@@ -170,13 +170,13 @@ mjpython PPO_metaW/main.py
 
 To test best model from saved weights: 
 ```
-mjpython PPO_metaW/main.py --mode test --actor_model ppo_actor.pth
+mjpython PPO_metaW/main.py --mode test --actor_model ppo_meta_actor_v7.pth
 ```
 
 To train best model from saved weights: 
-"MetaWorld predefined reward"
+"MetaWorld compatible reward"
 ```
-mjpython PPO_metaW/main.py --actor_model ppo_meta_actor.pth --critic_model ppo_meta_critic.pth
+mjpython PPO_metaW/main.py --actor_model ppo_meta_actor_v7.pth --critic_model ppo_meta_critic_7.pth
 ```
 
 "Own reward system"
@@ -199,7 +199,7 @@ mjpython train/train_torchrl.py
 ## Evaluation
 Evaluation is done by testing learned policy for environments and Weights and Biases monitoring. Own Wandb config can be defined in each models PPO Agent init class, and also use of logging can be switched on-of by the use of wand_use=True or False setting.
 
-Wandb graphs and visualizations can be found in the [documentation](docs)
+Different evaluations, wandb graphs and visualizations can be found in the [documentation](docs). Model Predictive Control([MPC](link)) research is also included. Presentation ppt file is located at [drive](link).
 
 ## Improvements 
 The project focuses on hyperparameters and initial settings of simple RL models, which allows different setting to be tried. 
