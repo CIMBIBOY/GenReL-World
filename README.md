@@ -199,7 +199,7 @@ mjpython train/train_torchrl.py
 ## Evaluation
 Evaluation is done by testing learned policy for environments and Weights and Biases monitoring. Own Wandb config can be defined in each models PPO Agent init class, and also use of logging can be switched on-of by the use of wand_use=True or False setting.
 
-Different evaluations, wandb graphs and visualizations can be found in the [documentation](docs). Model Predictive Control([MPC](link)) research is also included. Presentation ppt file is located at [drive](link).
+Different evaluations, wandb graphs and visualizations can be found in the [documentation](https://github.com/CIMBIBOY/GenReL-World/blob/Ait_fin/AIT_documentation.pdf). Model Predictive Control ([MPC](https://github.com/CIMBIBOY/GenReL-World/blob/Ait_fin/Model%20Predictive%20Control.pdf) research is also included. Presentation ppt file is located at [drive](https://docs.google.com/presentation/d/1oX8UYo6RtopAx6q7oIBsgyfJi_O_ah5X/edit?usp=drive_link&ouid=111613753585239345933&rtpof=true&sd=true).
 
 ## Improvements 
 The project focuses on hyperparameters and initial settings of simple RL models, which allows different setting to be tried. 
